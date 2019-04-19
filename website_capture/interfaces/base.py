@@ -1,0 +1,165 @@
+import os
+import copy
+
+class BaseScreenshot(object):
+    """
+    Base screenshoter interface does not implement any interface, it's just a
+    task runner for given page items.
+
+    Keyword Arguments:
+        headless (bool): Determine if browser is used through headless mode or
+            not. Default is True
+        basedir (string): Base directory where is save screenshot files.
+        size_dir (string): Enable or not behavior to create a subdirectory for
+            each different size used from page configurations. Default is True.
+            Remember to add a size into template
+            ``BaseScreenshot.DESTINATION_FILEPATH`` if you disable this and you
+            have more than one size used in your pages.
+    """
+    DESTINATION_FILEPATH = "{name}_base.png"
+    INTERFACE_CLASS = None
+    _default_size_value = (0, 0) # Do not change this
+
+    def __init__(self, basedir="", headless=True, size_dir=True):
+        self.headless = headless
+        self.basedir = basedir
+        self.size_dir = size_dir
+
+    def set_interface_size(self, interface, size):
+        """
+        Should set interface window size if given size is not null (``0x0``).
+        """
+        pass
+
+    def get_interface_config(self):
+        """
+        Should return available option object to pre configure your instance.
+        """
+        return {}
+
+    def get_destination_dir(self, interface, size):
+        """
+        Return base directory for screenshot file.
+        """
+        if not self.size_dir:
+            return self.basedir
+
+        if size == self._default_size_value:
+            return os.path.join(self.basedir, "default")
+
+        return os.path.join(
+            self.basedir,
+            "{}x{}".format(*size)
+        )
+
+    def get_file_destination(self, interface, size, page):
+        """
+        Return screenshot file destination path.
+
+        Given page item is passed to filename formating. So
+        ``BaseScreenshot.DESTINATION_FILEPATH`` template may contains reference
+        to item values like ``foo_{name}.png``. Ensure template only references
+        values available for every page items.
+        """
+        context = copy.deepcopy(page)
+
+        context.update({"size": size})
+
+        return os.path.join(
+            self.get_destination_dir(interface, size),
+            self.DESTINATION_FILEPATH.format(**context),
+        )
+
+    def get_interface_class(self):
+        """
+        Return interface object class.
+        """
+        return self.INTERFACE_CLASS
+
+    def get_interface_instance(self, config):
+        """
+        Return interface instance pre configured with given config object.
+        """
+        msg = "Your 'BaseScreenshot' object must implement an interface"
+        raise NotImplementedError(msg)
+
+    def tear_down_runner(self, interface, size, pages):
+        """
+        Implement this to close descriptor/pointer object after end of
+        ``BaseScreenshot.run()`` jobs, especially useful to close interface
+        when everything has been done.
+        """
+        print("Closing interface")
+
+    def capture(self, interface, size, page):
+        """
+        Perform screenshot with given interface for given page item.
+
+        This should allways return path where screenshot file has been
+        effectively writed to.
+        """
+        if not page.get("name", None):
+            msg = "Page configuration must have a 'name' value."
+            raise KeyError(msg)
+        if not page.get("url", None):
+            msg = "Page configuration must have an 'url' value."
+            raise KeyError(msg)
+
+        print("🔹 Getting page for:", page["name"])
+
+        path = self.get_file_destination(interface, size, page)
+        return path
+
+    def get_available_sizes(self, pages):
+        """
+        Walk on every page items to find all distinct sizes they require.
+        """
+        sizes = set([self._default_size_value])
+
+        for page in pages:
+            for item in page.get("sizes", []):
+                try:
+                    width, height = item
+                    sizes.add((width, height))
+                except ValueError:
+                    msg = ("Invalid size value, it should be a tuple of "
+                            "exactly two integers "
+                            "(width, height): {}").format(item)
+                    raise ValueError(msg)
+
+        return sorted(list(sizes))
+
+    def run(self, pages):
+        """
+        Proceed screenshot for every item
+        """
+        config = self.get_interface_config()
+        interface = self.get_interface_instance(config)
+        available_sizes = self.get_available_sizes(pages)
+
+        print("available_sizes:", available_sizes)
+        print()
+
+        # Enclause code inside a try block to ensure we close interface
+        # descriptor and avoid to let some interface threads opened
+        try:
+            for size in available_sizes:
+                print("Size: {}x{}".format(*size))
+                if size != self._default_size_value:
+                    self.set_interface_size(interface, size)
+
+                sizedir = self.get_destination_dir(interface, size)
+                if not os.path.exists(sizedir):
+                    os.makedirs(sizedir)
+
+                for item in pages:
+                    if size in item.get("sizes", [self._default_size_value]):
+                        path = self.capture(interface, size, item)
+                        print("  - Saved to :", path)
+
+                print()
+        except Exception as e:
+            self.tear_down_runner(interface, size, pages)
+            raise e
+        else:
+            self.tear_down_runner(interface, size, pages)
