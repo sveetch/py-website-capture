@@ -1,0 +1,42 @@
+# virtualenv
+.venv
+
+# Packaging
+build
+dist
+*.egg-info
+
+# sqlite DB
+db.sqlite3
+*.db
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.cache
+.pytest_cache
+nosetests.xml
+coverage.xml
+
+# VS Code
+.vscode
+
+# Mac Os
+.DS_Store
+
+# Temp files
+*~
+.~lock*
+
+# Swap files
+*.sw[po]
+
+# Logging files
+*.log
+
+# Screenshot outputs
+*.png

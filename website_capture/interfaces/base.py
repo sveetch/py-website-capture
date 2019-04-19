@@ -1,6 +1,8 @@
 import os
 import copy
 
+from selenium.common.exceptions import WebDriverException
+
 class BaseScreenshot(object):
     """
     Base screenshoter interface does not implement any interface, it's just a
@@ -152,10 +154,15 @@ class BaseScreenshot(object):
                 if not os.path.exists(sizedir):
                     os.makedirs(sizedir)
 
-                for item in pages:
-                    if size in item.get("sizes", [self._default_size_value]):
-                        path = self.capture(interface, size, item)
-                        print("  - Saved to :", path)
+                for page in pages:
+                    if size in page.get("sizes", [self._default_size_value]):
+                        try:
+                            path = self.capture(interface, size, page)
+                        except WebDriverException as e:
+                            print("Unable to reach page or unexpected error with:", page["url"])
+                            print(e)
+                        else:
+                            print("  - Saved to :", path)
 
                 print()
         except Exception as e:

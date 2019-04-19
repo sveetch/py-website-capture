@@ -19,8 +19,7 @@ PAGES = [
     },
     {
         "name": "djangodoc",
-        #"url": "http://192.168.0.103/doc/django-docs/",
-        "url": "http://192.168.0.103/doc/zouip/",
+        "url": "http://192.168.0.103/doc/django-docs/",
         "sizes": SIZES,
     },
     {
