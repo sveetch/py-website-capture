@@ -1,5 +1,6 @@
 import os
 import copy
+import logging
 
 from selenium.common.exceptions import WebDriverException
 
@@ -26,6 +27,7 @@ class BaseScreenshot(object):
         self.headless = headless
         self.basedir = basedir
         self.size_dir = size_dir
+        self.log = logging.getLogger("py-website-capture")
 
     def set_interface_size(self, interface, size):
         """
@@ -91,7 +93,7 @@ class BaseScreenshot(object):
         ``BaseScreenshot.run()`` jobs, especially useful to close interface
         when everything has been done.
         """
-        print("Closing interface")
+        self.log.info("Closing interface")
 
     def capture(self, interface, size, page):
         """
@@ -107,7 +109,7 @@ class BaseScreenshot(object):
             msg = "Page configuration must have an 'url' value."
             raise KeyError(msg)
 
-        print("🔹 Getting page for:", page["name"])
+        self.log.info("🔹 Getting page for: {}".format(page["name"]))
 
         path = self.get_file_destination(interface, size, page)
         return path
@@ -139,14 +141,13 @@ class BaseScreenshot(object):
         interface = self.get_interface_instance(config)
         available_sizes = self.get_available_sizes(pages)
 
-        print("available_sizes:", available_sizes)
-        print()
+        self.log.debug(f"available_sizes: {available_sizes}")
 
         # Enclause code inside a try block to ensure we close interface
         # descriptor and avoid to let some interface threads opened
         try:
             for size in available_sizes:
-                print("Size: {}x{}".format(*size))
+                self.log.debug("Size: {}x{}".format(*size))
                 if size != self._default_size_value:
                     self.set_interface_size(interface, size)
 
@@ -159,12 +160,13 @@ class BaseScreenshot(object):
                         try:
                             path = self.capture(interface, size, page)
                         except WebDriverException as e:
-                            print("Unable to reach page or unexpected error with:", page["url"])
-                            print(e)
+                            msg = ("Unable to reach page or unexpected error "
+                                   "with: {}")
+                            self.log.error(msg.format(page["url"]))
+                            self.log.error(e)
                         else:
-                            print("  - Saved to :", path)
+                            self.log.debug(f"  - Saved to : {path}")
 
-                print()
         except Exception as e:
             self.tear_down_runner(interface, size, pages)
             raise e

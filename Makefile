@@ -3,7 +3,7 @@ VENV_PATH=.venv
 PIP=$(VENV_PATH)/bin/pip
 FLAKE=$(VENV_PATH)/bin/flake8
 PYTEST=$(VENV_PATH)/bin/pytest
-PACKAGE_NAME=website_capture
+PACKAGE_NAME=py_website_capture
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -43,7 +43,7 @@ venv:
 .PHONY: venv
 
 install: venv
-	$(PIP) install -e .[dev]
+	$(PIP) install -e .[cli,dev]
 	mkdir -p outputs
 	@echo "You will need a WebDriver like 'geckodriver' or 'chromedriver'"
 .PHONY: install

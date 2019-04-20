@@ -102,7 +102,6 @@ Todo
 ****
 
 * Watch to get console logs from browser so we can log errors if any;
-* Use real logging, no ``print()`` anymore;
 * Command line interface to use a screenshoter fed from a JSON file;
 * Rethink capture with size dimension, since actually it perform
   a get of same url for each size, that is not really performant, (but

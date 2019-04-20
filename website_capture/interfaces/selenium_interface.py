@@ -11,10 +11,6 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
     Using Firefox browser directly from WebDriver through Selenium.
 
     Here the interface is a browser driver.
-
-    TODO:
-        * Implement set_interface_size
-        * many method are given new argument "size"
     """
     DESTINATION_FILEPATH = "{name}_firefox_selenium.png"
     INTERFACE_CLASS = webdriver.Firefox
