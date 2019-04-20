@@ -155,7 +155,7 @@ To read full help about a command, here the ``version`` command: ::
 
 To launch screenshot tasks: ::
 
-    website-capture screen --interface selenium --config website_capture/sample.json
+    website-capture screen --interface selenium --config sample.json
 
 ``--interface`` argument is not required but by default it use the dummy
 interface which does not nothing, this is just for development debugging.
