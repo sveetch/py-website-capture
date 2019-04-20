@@ -56,9 +56,9 @@ your browser update to an incompatible version with installed driver.
 geckodriver
 -----------
 
-First you need to have Firefox browser installed.
+You need to have Firefox browser installed.
 
-This involves a sudo prompt: ::
+Here is sample commands to quickly download and deploy driver on your system: ::
 
     wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
     tar xvzf geckodriver-v0.24.0-linux64.tar.gz
@@ -76,9 +76,9 @@ Links:
 chromedriver
 ------------
 
-First you need to have Chrome (or Chromium) browser installed.
+You need to have Chrome (or Chromium) browser installed.
 
-This involves a sudo prompt: ::
+Here is sample commands to quickly download and deploy driver on your system: ::
 
     wget https://chromedriver.storage.googleapis.com/73.0.3683.68/chromedriver_linux64.zip
     unzip chromedriver_linux64.zip
@@ -91,27 +91,83 @@ Links:
 * `<http://chromedriver.chromium.org/>`_;
 * `<https://pypi.org/project/selenium/#drivers>`_;
 
-Install project
-***************
+Going full headless
+-------------------
 
-::
+Even interfaces have a ``headless`` mode, it only apply that browser are not
+displayed when a Webdriver is performing request. You still need a common
+desktop environment to run a browser which is not desirable on a server.
 
+To be able to use this project on a server you may look at ``Xvfb`` tool.
+
+* `<https://en.wikipedia.org/wiki/Xvfb>`_;
+* `<http://elementalselenium.com/tips/38-headless>`_;
+* `<http://tobyho.com/2015/01/09/headless-browser-testing-xvfb/>`_;
+* `<https://github.com/ponty/pyvirtualdisplay>`_;
+
+Install
+*******
+
+Clone repository and install it as a project ::
+
+    git clone https://github.com/sveetch/py-website-capture
+    cd py-website-capture
     make install
+
+``py-website-capture`` package is currently not released yet on Pypi so to
+install it you will need to do something like: ::
+
+    pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture
+
+However in this way it will only usable as Python module, you won't have command line requirements.
+
+To have command line working you will need to do instead: ::
+
+    pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture[cli]
+
+Usage
+*****
+
+Activate virtual environment: ::
+
+    source .venv/bin/activate
+
+Then you can call command line interface, for example to get programm
+version: ::
+
+    website-capture version
+
+You may also directly reach the command line interface without to activate
+virtual environment: ::
+
+    .venv/bin/website-capture version
+
+To read help about programm and available commands: ::
+
+    website-capture -h
+
+To read full help about a command, here the ``version`` command: ::
+
+    website-capture version -h
+
+To launch screenshot tasks: ::
+
+    website-capture screen --interface selenium --config website_capture/sample.json
+
+``--interface`` argument is not required but by default it use the dummy
+interface which does not nothing, this is just for development debugging.
+Available choices are ``dummy``, ``selenium`` and ``splinter``.
+
+``--config`` argument is required and must be a path to an existing and valid
+JSON configuration file.
 
 Todo
 ****
 
 * Watch to get console logs from browser so we can log errors if any;
-* Command line interface to use a screenshoter fed from a JSON file;
 * Rethink capture with size dimension, since actually it perform
   a get of same url for each size, that is not really performant, (but
   maybe it's better to start again an interface instance to avoid bugs
   when resizing?);
 * Test coverage for base stuff, we won't test real screenshoters which
   involves a real browser;
-* Little documentation about procedure to go full headless with Xvfb so
-  project could be used on a server;
-
-  * `<http://elementalselenium.com/tips/38-headless>`_;
-  * `<http://tobyho.com/2015/01/09/headless-browser-testing-xvfb/>`_;
-  * `<https://github.com/ponty/pyvirtualdisplay>`_;

@@ -4,7 +4,6 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 from website_capture.interfaces.base import BaseScreenshot
 
-from website_capture.settings import *
 
 class SeleniumFirefoxScreenshot(BaseScreenshot):
     """
@@ -69,21 +68,3 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
         interface.get_screenshot_as_file(path)
 
         return path
-
-
-if __name__ == "__main__":
-    print("🤖 SeleniumFirefoxScreenshot")
-    print()
-    screenshoter = SeleniumFirefoxScreenshot(
-        basedir=DUMPS_PATH,
-    )
-    screenshoter.run(pages=PAGES)
-    print()
-
-    print("🤖 SeleniumChromeScreenshot")
-    print()
-    screenshoter = SeleniumChromeScreenshot(
-        basedir=DUMPS_PATH,
-    )
-    screenshoter.run(pages=PAGES)
-    print()

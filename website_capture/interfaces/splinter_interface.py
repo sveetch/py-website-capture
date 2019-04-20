@@ -2,7 +2,6 @@ from splinter import Browser
 
 from website_capture.interfaces.base import BaseScreenshot
 
-from website_capture.settings import *
 
 class SplinterFirefoxScreenshot(BaseScreenshot):
     """
@@ -47,21 +46,3 @@ class SplinterChromeScreenshot(SplinterFirefoxScreenshot):
     """
     DESTINATION_FILEPATH = "{name}_chrome_splinter.png"
     BROWSER_TYPE = "chrome"
-
-
-if __name__ == "__main__":
-    print("🤖 SplinterFirefoxScreenshot")
-    print()
-    screenshoter = SplinterFirefoxScreenshot(
-        basedir=DUMPS_PATH,
-    )
-    screenshoter.run(pages=PAGES)
-    print()
-
-    print("🤖 SplinterChromeScreenshot")
-    print()
-    screenshoter = SplinterChromeScreenshot(
-        basedir=DUMPS_PATH,
-    )
-    screenshoter.run(pages=PAGES)
-    print()

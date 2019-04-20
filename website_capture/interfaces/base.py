@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 import os
 import copy
 import logging
 
 from selenium.common.exceptions import WebDriverException
+
 
 class BaseScreenshot(object):
     """
@@ -35,6 +37,25 @@ class BaseScreenshot(object):
         """
         pass
 
+    def get_size_repr(self, width, height):
+        """
+        Return size representation.
+
+        Arguments:
+            width (int): Positive width value.
+            height (int): Positive Height value.
+
+        Return:
+            string: Size representation such as ``WIDTHxHEIGHT`` if size is
+            not equal to empty size ``BaseScreenshot._default_size_value``,
+            else return ``Default``.
+        """
+        size_repr = "Default"
+        if (width, height) != self._default_size_value:
+            size_repr = "{}x{}".format(width, height)
+
+        return size_repr
+
     def get_interface_config(self):
         """
         Should return available option object to pre configure your instance.
@@ -48,12 +69,9 @@ class BaseScreenshot(object):
         if not self.size_dir:
             return self.basedir
 
-        if size == self._default_size_value:
-            return os.path.join(self.basedir, "default")
-
         return os.path.join(
             self.basedir,
-            "{}x{}".format(*size)
+            self.get_size_repr(*size)
         )
 
     def get_file_destination(self, interface, size, page):
@@ -109,7 +127,10 @@ class BaseScreenshot(object):
             msg = "Page configuration must have an 'url' value."
             raise KeyError(msg)
 
-        self.log.info("🔹 Getting page for: {}".format(page["name"]))
+        self.log.info("🔹 Getting page for: {} ({})".format(
+            page["name"],
+            self.get_size_repr(*size),
+        ))
 
         path = self.get_file_destination(interface, size, page)
         return path
@@ -147,10 +168,11 @@ class BaseScreenshot(object):
         # descriptor and avoid to let some interface threads opened
         try:
             for size in available_sizes:
-                self.log.debug("Size: {}x{}".format(*size))
+                self.log.debug("Size: {}".format(self.get_size_repr(*size)))
                 if size != self._default_size_value:
                     self.set_interface_size(interface, size)
 
+                # Create destination dir if not already exists
                 sizedir = self.get_destination_dir(interface, size)
                 if not os.path.exists(sizedir):
                     os.makedirs(sizedir)

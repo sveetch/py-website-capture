@@ -47,3 +47,7 @@ install: venv
 	mkdir -p outputs
 	@echo "You will need a WebDriver like 'geckodriver' or 'chromedriver'"
 .PHONY: install
+
+screenshots:
+	echo ${0}
+.PHONY: screenshots

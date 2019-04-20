@@ -1,7 +1,5 @@
 from website_capture.interfaces.base import BaseScreenshot
 
-from website_capture.settings import *
-
 
 class DummyInterface(object):
     """
@@ -34,8 +32,3 @@ class DummyScreenshot(BaseScreenshot):
     def capture(self, interface, size, page):
         path = super().capture(interface, size, page)
         return path
-
-
-if __name__ == "__main__":
-    screenshoter = DummyScreenshot(basedir=DUMPS_PATH)
-    screenshoter.run(pages=PAGES)
