@@ -128,6 +128,9 @@ To have command line working you will need to do instead: ::
 Usage
 *****
 
+Command line interface
+----------------------
+
 Activate virtual environment: ::
 
     source .venv/bin/activate
@@ -160,6 +163,52 @@ Available choices are ``dummy``, ``selenium`` and ``splinter``.
 
 ``--config`` argument is required and must be a path to an existing and valid
 JSON configuration file.
+
+Configuration file
+------------------
+
+A configuration file in JSON is required to perform tasks, it will contain
+interface settings to use and pages to capture.
+
+Here is a sample: ::
+
+    {
+        "output_dir": "/home/foo/outputs/",
+        "size_dir": true,
+        "headless": true,
+        "pages": [
+            {
+                "name": "perdu.com",
+                "url": "http://perdu.com/"
+            },
+            {
+                "name": "google.com",
+                "url": "https://www.google.com/",
+                "sizes": [
+                    [330, 768],
+                    [1440, 768]
+                ]
+            }
+        ]
+    }
+
+output_dir
+    Required path where files will be saved.
+size_dir
+    Optional boolean to enable or not to add size name as a subdirectory of
+    ``output_dir`` when saving file according to the current size they are
+    captured. Default behavior is to enable it.
+headless
+    Optional boolean to enable or not headless mode for interface, meaning
+    when enabled the used browser won't display to your screen, if disabled
+    browser will show during capture is performed, then it will automatically
+    close once finished. Default behavior is to enable it.
+pages
+    List of page entry to capture. Each item must have a ``name`` and ``url``
+    values. Optionally you can define a ``sizes`` value which is a list of
+    window sizes to use during capture, every size will create a new file. This
+    is recommended since default size depend from interface and are often too
+    small.
 
 Todo
 ****
