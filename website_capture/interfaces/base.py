@@ -62,7 +62,7 @@ class BaseScreenshot(object):
         """
         return {}
 
-    def get_destination_dir(self, interface, size):
+    def get_destination_dir(self, size):
         """
         Return base directory for screenshot file.
         """
@@ -88,7 +88,7 @@ class BaseScreenshot(object):
         context.update({"size": size})
 
         return os.path.join(
-            self.get_destination_dir(interface, size),
+            self.get_destination_dir(size),
             self.DESTINATION_FILEPATH.format(**context),
         )
 
@@ -159,38 +159,35 @@ class BaseScreenshot(object):
         Proceed screenshot for every item
         """
         config = self.get_interface_config()
-        interface = self.get_interface_instance(config)
         available_sizes = self.get_available_sizes(pages)
 
         self.log.debug(f"available_sizes: {available_sizes}")
 
-        # Enclause code inside a try block to ensure we close interface
-        # descriptor and avoid to let some interface threads opened
-        try:
-            for size in available_sizes:
-                self.log.debug("Size: {}".format(self.get_size_repr(*size)))
-                if size != self._default_size_value:
-                    self.set_interface_size(interface, size)
+        for size in available_sizes:
+            self.log.debug("Size: {}".format(self.get_size_repr(*size)))
 
-                # Create destination dir if not already exists
-                sizedir = self.get_destination_dir(interface, size)
-                if not os.path.exists(sizedir):
-                    os.makedirs(sizedir)
+            # Create destination dir if not already exists
+            sizedir = self.get_destination_dir(size)
+            if not os.path.exists(sizedir):
+                os.makedirs(sizedir)
 
-                for page in pages:
-                    if size in page.get("sizes", [self._default_size_value]):
-                        try:
-                            path = self.capture(interface, size, page)
-                        except WebDriverException as e:
-                            msg = ("Unable to reach page or unexpected error "
-                                   "with: {}")
-                            self.log.error(msg.format(page["url"]))
-                            self.log.error(e)
-                        else:
-                            self.log.debug(f"  - Saved to : {path}")
+            for page in pages:
+                if size in page.get("sizes", [self._default_size_value]):
+                    interface = self.get_interface_instance(config)
+                    if size != self._default_size_value:
+                        self.set_interface_size(interface, size)
 
-        except Exception as e:
-            self.tear_down_runner(interface, size, pages)
-            raise e
-        else:
-            self.tear_down_runner(interface, size, pages)
+                    try:
+                        path = self.capture(interface, size, page)
+                    except WebDriverException as e:
+                        self.tear_down_runner(interface, size, pages)
+                        msg = ("Unable to reach page or unexpected error "
+                                "with: {}")
+                        self.log.error(msg.format(page["url"]))
+                        self.log.error(e)
+                    except Exception as e:
+                        self.tear_down_runner(interface, size, pages)
+                        raise e
+                    else:
+                        self.tear_down_runner(interface, size, pages)
+                        self.log.debug(f"  - Saved to : {path}")

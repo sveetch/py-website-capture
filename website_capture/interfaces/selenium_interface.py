@@ -16,7 +16,7 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
 
     def get_interface_instance(self, options):
         klass = self.get_interface_class()
-        interface = klass(options=options)
+        interface = klass(**options)
 
         return interface
 
@@ -29,7 +29,9 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
         if self.headless:
             options.headless = True
 
-        return options
+        return {
+            "options": options,
+        }
 
     def capture(self, interface, size, page):
         path = super().capture(interface, size, page)
@@ -58,7 +60,9 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
         if self.headless:
             options.headless = True
 
-        return options
+        return {
+            "options": options,
+        }
 
     def capture(self, interface, size, page):
         path = super().capture(interface, size, page)
