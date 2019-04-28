@@ -22,6 +22,8 @@ class SplinterFirefoxScreenshot(BaseScreenshot):
         if self.headless:
             options["headless"] = True
 
+        options["log_path"] = config["log_path"]
+
         return options
 
     def get_interface_instance(self, options):

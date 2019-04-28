@@ -20,14 +20,12 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
     def get_interface_options(self, config):
         options = FirefoxOptions()
 
-        # TODO: We need to get file destination path here to use it to make
-        # its own log file.
-
         if self.headless:
             options.headless = True
 
         return {
             "options": options,
+            "log_path": config["log_path"],
         }
 
     def get_interface_instance(self, options):

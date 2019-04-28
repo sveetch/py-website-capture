@@ -123,15 +123,13 @@ class BaseScreenshot(object):
         config["size"] = size
 
         config["destination"] = self.get_file_destination(config)
-        config["logfile"] = ".".join([config["destination"], "driver", "log"])
+        config["log_path"] = ".".join([config["destination"], "driver", "log"])
 
         return config
 
     def get_interface_options(self, config):
         """
         Should return available option object to pre configure your instance.
-
-        TODO: Interfaces should define logfile from page config
         """
         return {}
 
@@ -154,6 +152,15 @@ class BaseScreenshot(object):
 
         This should allways return path where screenshot file has been
         effectively writed to.
+
+        TODO:
+            * Capture browser console logs (errors, warnings, etc.. occuring
+              during page loading/rendering, not driver, etc.. logs) in an
+              optional file. Need tests on various behavior with some dummy
+              pages to reproduce cases.
+            * Start moving screenshot code into its own method, so capture stay
+              as "a capture theses things from page" and cut "things" into
+              individual methods so we can choose what thing jobs to perform;
         """
         self.log.info("🔹 Getting page for: {} ({})".format(
             config["name"],
