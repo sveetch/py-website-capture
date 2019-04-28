@@ -14,17 +14,14 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
     DESTINATION_FILEPATH = "{name}_firefox_selenium.png"
     INTERFACE_CLASS = webdriver.Firefox
 
-    def get_interface_instance(self, options):
-        klass = self.get_interface_class()
-        interface = klass(**options)
+    def set_interface_size(self, interface, config):
+        interface.set_window_size(*config["size"])
 
-        return interface
-
-    def set_interface_size(self, interface, size):
-        interface.set_window_size(*size)
-
-    def get_interface_config(self):
+    def get_interface_options(self, config):
         options = FirefoxOptions()
+
+        # TODO: We need to get file destination path here to use it to make
+        # its own log file.
 
         if self.headless:
             options.headless = True
@@ -33,18 +30,24 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
             "options": options,
         }
 
-    def capture(self, interface, size, page):
-        path = super().capture(interface, size, page)
+    def get_interface_instance(self, options):
+        klass = self.get_interface_class()
+        interface = klass(**options)
 
-        interface.get(page["url"])
+        return interface
+
+    def capture(self, interface, config):
+        super().capture(interface, config)
+
+        interface.get(config["url"])
 
         el = interface.find_element_by_tag_name('body')
-        el.screenshot(path)
+        el.screenshot(config["destination"])
 
-        return path
+        return config["destination"]
 
-    def tear_down_runner(self, interface, size, pages):
-        super().tear_down_runner(interface, size, pages)
+    def tear_down_interface(self, interface):
+        super().tear_down_interface(interface)
         interface.quit()
 
 
@@ -55,7 +58,7 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
     DESTINATION_FILEPATH = "{name}_chrome_selenium.png"
     INTERFACE_CLASS = webdriver.Chrome
 
-    def get_interface_config(self):
+    def get_interface_options(self, config):
         options = ChromeOptions()
         if self.headless:
             options.headless = True
@@ -64,11 +67,11 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
             "options": options,
         }
 
-    def capture(self, interface, size, page):
-        path = super().capture(interface, size, page)
+    def capture(self, interface, config):
+        super().capture(interface, config)
 
-        interface.get(page["url"])
+        interface.get(config["url"])
 
-        interface.get_screenshot_as_file(path)
+        interface.get_screenshot_as_file(config["destination"])
 
-        return path
+        return config["destination"]

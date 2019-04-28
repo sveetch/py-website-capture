@@ -37,6 +37,28 @@ Requires
 * Pip;
 * A browser and its `WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_;
 
+Install application
+*******************
+
+Clone repository and install it as a project ::
+
+    git clone https://github.com/sveetch/py-website-capture
+    cd py-website-capture
+    make install
+
+``py-website-capture`` package is currently not released yet on Pypi so to
+install it you will need to do something like: ::
+
+    pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture
+
+However in this way it will only usable as Python module, you won't have command line requirements.
+
+To have command line working you will need to do instead: ::
+
+    pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture[cli]
+
+Once done you may what below to install a working driver for required browsers.
+
 Install drivers
 ***************
 
@@ -104,26 +126,6 @@ To be able to use this project on a server you may look at ``Xvfb`` tool.
 * `<http://elementalselenium.com/tips/38-headless>`_;
 * `<http://tobyho.com/2015/01/09/headless-browser-testing-xvfb/>`_;
 * `<https://github.com/ponty/pyvirtualdisplay>`_;
-
-Install
-*******
-
-Clone repository and install it as a project ::
-
-    git clone https://github.com/sveetch/py-website-capture
-    cd py-website-capture
-    make install
-
-``py-website-capture`` package is currently not released yet on Pypi so to
-install it you will need to do something like: ::
-
-    pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture
-
-However in this way it will only usable as Python module, you won't have command line requirements.
-
-To have command line working you will need to do instead: ::
-
-    pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture[cli]
 
 Usage
 *****
@@ -204,7 +206,7 @@ headless
     browser will show during capture is performed, then it will automatically
     close once finished. Default behavior is to enable it.
 pages
-    List of page entry to capture. Each item must have a ``name`` and ``url``
+    List of page items to capture. Each item must have a ``name`` and ``url``
     values. Optionally you can define a ``sizes`` value which is a list of
     window sizes to use during capture, every size will create a new file. This
     is recommended since default size depend from interface and are often too
@@ -214,9 +216,6 @@ Todo
 ****
 
 * Watch to get console logs from browser so we can log errors if any;
-* Rethink capture with size dimension, since actually it perform
-  a get of same url for each size, that is not really performant, (but
-  maybe it's better to start again an interface instance to avoid bugs
-  when resizing?);
+* Ensure accurate capture behavior with almost every websites;
 * Test coverage for base stuff, we won't test real screenshoters which
   involves a real browser;

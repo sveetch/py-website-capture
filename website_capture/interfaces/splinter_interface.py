@@ -13,7 +13,10 @@ class SplinterFirefoxScreenshot(BaseScreenshot):
     DESTINATION_FILEPATH = "{name}_firefox_splinter.png"
     BROWSER_TYPE = "firefox"
 
-    def get_interface_config(self):
+    def set_interface_size(self, interface, config):
+        interface.driver.set_window_size(*config["size"])
+
+    def get_interface_options(self, config):
         options = {}
 
         if self.headless:
@@ -21,22 +24,20 @@ class SplinterFirefoxScreenshot(BaseScreenshot):
 
         return options
 
-    def set_interface_size(self, interface, size):
-        interface.driver.set_window_size(*size)
-
     def get_interface_instance(self, options):
         return Browser(self.BROWSER_TYPE, **options)
 
-    def capture(self, interface, size, page):
-        path = super().capture(interface, size, page)
+    def capture(self, interface, config):
+        super().capture(interface, config)
 
-        interface.visit(page["url"])
-        screenshot_path = interface.screenshot(path, full=True)
+        interface.visit(config["url"])
+        screenshot_path = interface.screenshot(config["destination"],
+                                               full=True)
 
         return screenshot_path
 
-    def tear_down_runner(self, interface, size, pages):
-        super().tear_down_runner(interface, size, pages)
+    def tear_down_interface(self, interface):
+        super().tear_down_interface(interface)
         interface.quit()
 
 

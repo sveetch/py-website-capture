@@ -29,6 +29,6 @@ class DummyScreenshot(BaseScreenshot):
         klass = self.get_interface_class()
         return klass()
 
-    def capture(self, interface, size, page):
-        path = super().capture(interface, size, page)
+    def capture(self, interface, config):
+        path = super().capture(interface, config)
         return path

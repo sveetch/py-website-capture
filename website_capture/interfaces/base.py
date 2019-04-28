@@ -31,11 +31,24 @@ class BaseScreenshot(object):
         self.size_dir = size_dir
         self.log = logging.getLogger("py-website-capture")
 
-    def set_interface_size(self, interface, size):
+    def get_available_sizes(self, pages):
         """
-        Should set interface window size if given size is not null (``0x0``).
+        Walk on every page items to find all distinct sizes they require.
         """
-        pass
+        sizes = set([self._default_size_value])
+
+        for page in pages:
+            for item in page.get("sizes", []):
+                try:
+                    width, height = item
+                    sizes.add((width, height))
+                except ValueError:
+                    msg = ("Invalid size value, it should be a tuple of "
+                            "exactly two integers "
+                            "(width, height): {}").format(item)
+                    raise ValueError(msg)
+
+        return sorted(list(sizes))
 
     def get_size_repr(self, width, height):
         """
@@ -56,11 +69,12 @@ class BaseScreenshot(object):
 
         return size_repr
 
-    def get_interface_config(self):
+    def set_interface_size(self, interface, config):
         """
-        Should return available option object to pre configure your instance.
+        Should set interface window size if given page size is not
+        null (``0x0``).
         """
-        return {}
+        pass
 
     def get_destination_dir(self, size):
         """
@@ -74,7 +88,7 @@ class BaseScreenshot(object):
             self.get_size_repr(*size)
         )
 
-    def get_file_destination(self, interface, size, page):
+    def get_file_destination(self, config):
         """
         Return screenshot file destination path.
 
@@ -83,14 +97,43 @@ class BaseScreenshot(object):
         to item values like ``foo_{name}.png``. Ensure template only references
         values available for every page items.
         """
-        context = copy.deepcopy(page)
-
-        context.update({"size": size})
+        filename = config.get("filename", self.DESTINATION_FILEPATH)
 
         return os.path.join(
-            self.get_destination_dir(size),
-            self.DESTINATION_FILEPATH.format(**context),
+            self.get_destination_dir(config["size"]),
+            filename.format(**config),
         )
+
+    def get_page_config(self, page, size):
+        """
+        Validate and return page configuration.
+
+        Base configuration is given page item plus some additional context.
+        """
+        if not page.get("name", None):
+            msg = "Page configuration must have a 'name' value."
+            raise KeyError(msg)
+
+        if not page.get("url", None):
+            msg = "Page configuration must have an 'url' value."
+            raise KeyError(msg)
+
+        config = copy.deepcopy(page)
+
+        config["size"] = size
+
+        config["destination"] = self.get_file_destination(config)
+        config["logfile"] = ".".join([config["destination"], "driver", "log"])
+
+        return config
+
+    def get_interface_options(self, config):
+        """
+        Should return available option object to pre configure your instance.
+
+        TODO: Interfaces should define logfile from page config
+        """
+        return {}
 
     def get_interface_class(self):
         """
@@ -105,60 +148,32 @@ class BaseScreenshot(object):
         msg = "Your 'BaseScreenshot' object must implement an interface"
         raise NotImplementedError(msg)
 
-    def tear_down_runner(self, interface, size, pages):
+    def capture(self, interface, config):
         """
-        Implement this to close descriptor/pointer object after end of
-        ``BaseScreenshot.run()`` jobs, especially useful to close interface
-        when everything has been done.
-        """
-        self.log.info("Closing interface")
-
-    def capture(self, interface, size, page):
-        """
-        Perform screenshot with given interface for given page item.
+        Perform screenshot with given interface for given page configuration.
 
         This should allways return path where screenshot file has been
         effectively writed to.
         """
-        if not page.get("name", None):
-            msg = "Page configuration must have a 'name' value."
-            raise KeyError(msg)
-        if not page.get("url", None):
-            msg = "Page configuration must have an 'url' value."
-            raise KeyError(msg)
-
         self.log.info("🔹 Getting page for: {} ({})".format(
-            page["name"],
-            self.get_size_repr(*size),
+            config["name"],
+            self.get_size_repr(*config["size"]),
         ))
 
-        path = self.get_file_destination(interface, size, page)
-        return path
+        return config["destination"]
 
-    def get_available_sizes(self, pages):
+    def tear_down_interface(self, interface):
         """
-        Walk on every page items to find all distinct sizes they require.
+        Implement this to close descriptor/pointer object after end of
+        each ``BaseScreenshot.run()`` job, especially useful to close
+        interface when page capture has been done.
         """
-        sizes = set([self._default_size_value])
-
-        for page in pages:
-            for item in page.get("sizes", []):
-                try:
-                    width, height = item
-                    sizes.add((width, height))
-                except ValueError:
-                    msg = ("Invalid size value, it should be a tuple of "
-                            "exactly two integers "
-                            "(width, height): {}").format(item)
-                    raise ValueError(msg)
-
-        return sorted(list(sizes))
+        self.log.debug("Closing interface")
 
     def run(self, pages):
         """
         Proceed screenshot for every item
         """
-        config = self.get_interface_config()
         available_sizes = self.get_available_sizes(pages)
 
         self.log.debug(f"available_sizes: {available_sizes}")
@@ -173,21 +188,25 @@ class BaseScreenshot(object):
 
             for page in pages:
                 if size in page.get("sizes", [self._default_size_value]):
-                    interface = self.get_interface_instance(config)
+                    config = self.get_page_config(page, size)
+                    print(config)
+                    options = self.get_interface_options(config)
+                    interface = self.get_interface_instance(options)
+
                     if size != self._default_size_value:
-                        self.set_interface_size(interface, size)
+                        self.set_interface_size(interface, config)
 
                     try:
-                        path = self.capture(interface, size, page)
+                        path = self.capture(interface, config)
                     except WebDriverException as e:
-                        self.tear_down_runner(interface, size, pages)
+                        self.tear_down_interface(interface)
                         msg = ("Unable to reach page or unexpected error "
                                 "with: {}")
-                        self.log.error(msg.format(page["url"]))
+                        self.log.error(msg.format(config["url"]))
                         self.log.error(e)
                     except Exception as e:
-                        self.tear_down_runner(interface, size, pages)
+                        self.tear_down_interface(interface)
                         raise e
                     else:
-                        self.tear_down_runner(interface, size, pages)
                         self.log.debug(f"  - Saved to : {path}")
+                        self.tear_down_interface(interface)
