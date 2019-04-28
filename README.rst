@@ -37,8 +37,8 @@ Requires
 * Pip;
 * A browser and its `WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_;
 
-Install application
-*******************
+Install
+*******
 
 Clone repository and install it as a project ::
 
@@ -57,7 +57,7 @@ To have command line working you will need to do instead: ::
 
     pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture[cli]
 
-Once done you may what below to install a working driver for required browsers.
+Once done you may see below to install a working driver for required browsers.
 
 Install drivers
 ***************
@@ -206,11 +206,35 @@ headless
     browser will show during capture is performed, then it will automatically
     close once finished. Default behavior is to enable it.
 pages
-    List of page items to capture. Each item must have a ``name`` and ``url``
-    values. Optionally you can define a ``sizes`` value which is a list of
-    window sizes to use during capture, every size will create a new file. This
-    is recommended since default size depend from interface and are often too
-    small.
+    List of page items to capture see next section for details.
+
+Page item
+.........
+
+Each item must have a ``name`` and ``url``
+values. Optionally you can define a ``sizes`` value which is a list of
+window sizes to use during capture, every size will create a new file. This
+is recommended since default size depend from interface and are often too
+small.
+
+Each item may have following options
+
+name
+    Required name to use to display in log for page and possibly used into
+    filename destination.
+url
+    Required url to get to perform capture.
+sizes
+    Optional list of sizes which browser will adopts, each one will perform a
+    new capture for given size. Each size is a list of two items respectively
+    for width and height. If no sizes is defined the default size from driver
+    is used, this is not recommanded since each driver has its own size which
+    is often odd. If needed you can add default size with value ``(0, 0)``.
+filename
+    Optional filename. When undefined, default behavior is to use the filename
+    format from interface class that commonly contains size, page name and
+    interface name. Filename can be formatted with some pattern according to
+    page configuration. Like ``{name}``, ``{size}``, ``{url}``.
 
 Todo
 ****
