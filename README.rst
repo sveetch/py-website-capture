@@ -229,7 +229,7 @@ sizes
     new capture for given size. Each size is a list of two items respectively
     for width and height. If no sizes is defined the default size from driver
     is used, this is not recommanded since each driver has its own size which
-    is often odd. If needed you can add default size with value ``(0, 0)``.
+    is often odd. If needed you can add default size with value ``[0, 0]``.
 filename
     Optional filename. When undefined, default behavior is to use the filename
     format from interface class that commonly contains size, page name and
