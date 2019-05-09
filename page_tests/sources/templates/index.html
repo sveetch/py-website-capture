@@ -1,0 +1,18 @@
+{% extends "skeleton.html" %}
+
+{% block content -%}
+    <div class="row column">
+        <div class="v-space-short">
+            <h1 class="title-2 text-upper text-center underline short far">{{ page_title }}</h1>
+            <div class="v-space-short">
+                <ul>
+                {% for page in pages -%}
+                    <li>
+                        <a href="{{ page_relative_position }}{{ page.destination }}">{{ page.title }}</a>
+                    </li>
+                {%- endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{%- endblock content %}

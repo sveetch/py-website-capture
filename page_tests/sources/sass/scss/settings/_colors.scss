@@ -1,0 +1,129 @@
+/*
+ * Colors settings
+ */
+
+// Named colors
+// ---------
+$black: #000000;
+$white: #ffffff;
+$gray25: #404040;
+$gray99: #fefefe;
+$bluesapphire1: #022e4b;
+$bluesapphire2: #0a507c;
+$bluesapphire5: #1689b9;
+$bluesapphire9: #edf8ff;
+$whitesmoke2: #38393d;
+$whitesmoke5: #b5b8c4;
+$whitesmoke9: #f3f5fb;
+
+// Update Foundation palette
+$foundation-palette: (
+  primary: $bluesapphire5,
+  secondary: $whitesmoke5,
+  success: #3adb76,
+  warning: #ffae00,
+  alert: #cc4b37,
+);
+
+
+// Color schemes
+// ---------
+$white-color-scheme: (
+    font-color: $gray25,
+    background: $white,
+);
+
+$black-color-scheme: (
+    font-color: $white,
+    background: $black,
+);
+
+$gray99-color-scheme: (
+    font-color: $whitesmoke2,
+    background: $gray99,
+);
+
+$whitesmoke2-color-scheme: (
+    font-color: $white,
+    background: $whitesmoke2,
+    hover-background: lighten($whitesmoke2, 10%),
+);
+
+$whitesmoke5-color-scheme: (
+    font-color: $gray25,
+    background: $whitesmoke5,
+    hover-background: lighten($whitesmoke5, 10%),
+);
+
+$whitesmoke5-hollow-color-scheme: (
+    font-color: darken($whitesmoke5, 15%),
+    background: transparent,
+    hover-background: lighten($whitesmoke5, 20%),
+    border-color: $whitesmoke5,
+    border-width: 1px,
+    border-style: solid,
+);
+
+$whitesmoke9-color-scheme: (
+    font-color: $gray25,
+    background: $whitesmoke9,
+);
+
+$bluesapphire1-color-scheme: (
+    font-color: $white,
+    background: $bluesapphire1,
+);
+
+$bluesapphire2-color-scheme: (
+    font-color: $white,
+    background: $bluesapphire2,
+);
+
+$bluesapphire2-hollow-color-scheme: (
+    font-color: $bluesapphire2,
+    background: transparent,
+    hover-background: $bluesapphire9,
+    border-color: $bluesapphire2,
+    border-width: 1px,
+    border-style: solid,
+);
+
+$bluesapphire5-color-scheme: (
+    font-color: $white,
+    background: $bluesapphire5,
+);
+
+$bluesapphire9-color-scheme: (
+    font-color: $bluesapphire2,
+    background: $bluesapphire9,
+);
+
+$sv-colors-scheme-default: $gray99-color-scheme;
+
+$sv-colors-schemes: (
+    white: $white-color-scheme,
+    black: $black-color-scheme,
+    bluesapphire1: $bluesapphire1-color-scheme,
+    bluesapphire2: $bluesapphire2-color-scheme,
+    bluesapphire2-hollow: $bluesapphire2-hollow-color-scheme,
+    bluesapphire5: $bluesapphire5-color-scheme,
+    bluesapphire9: $bluesapphire9-color-scheme,
+    whitesmoke2: $whitesmoke2-color-scheme,
+    whitesmoke5: $whitesmoke5-color-scheme,
+    whitesmoke5-hollow: $whitesmoke5-hollow-color-scheme,
+    whitesmoke9: $whitesmoke9-color-scheme,
+    gray99: $gray99-color-scheme,
+);
+
+$sv-color-text-palette: (
+    white: $white,
+    black: $black,
+    bluesapphire1: $bluesapphire1,
+    bluesapphire2: $bluesapphire2,
+    bluesapphire5: $bluesapphire5,
+    bluesapphire9: $bluesapphire9,
+    whitesmoke2: $whitesmoke2,
+    whitesmoke5: $whitesmoke5,
+    whitesmoke9: $whitesmoke9,
+    gray99: $gray99,
+);

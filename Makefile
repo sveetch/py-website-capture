@@ -14,6 +14,10 @@ help:
 	@echo "  clean-pycache       -- to remove all __pycache__, this is recursive from current directory"
 	@echo "  clean-install       -- to clean Python side installation"
 	@echo "  clean-build         -- to clean screenshot outputs"
+	@echo ""
+	@echo "  flake               -- to launch Flake8 checking"
+	@echo "  tests               -- to launch tests using Pytest"
+	@echo "  quality             -- to launch Flake8 checking and Pytest"
 	@echo
 
 clean-pycache:
@@ -48,6 +52,13 @@ install: venv
 	@echo "You will need a WebDriver like 'geckodriver' or 'chromedriver'"
 .PHONY: install
 
-screenshots:
-	echo ${0}
-.PHONY: screenshots
+flake:
+	$(FLAKE) --show-source $(PACKAGE_NAME)
+.PHONY: flake
+
+tests:
+	$(PYTEST) -vv --exitfirst tests/
+.PHONY: tests
+
+quality: tests flake
+.PHONY: quality

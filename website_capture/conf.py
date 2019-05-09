@@ -11,7 +11,10 @@ def get_project_configuration(fileobject):
 
     Arguments:
         fileobject (object): A file object to read for JSON content, you have
-            to close file object once method has finished.
+            to close file object once method has finished. Instead of real file
+            object it can be a in-memory stream for text I/O but since stream
+            has no ``name`` attribute, debug log will print out stream object
+            representation.
 
     Return:
         dict: Configuration items in a dict.
@@ -19,7 +22,8 @@ def get_project_configuration(fileobject):
     logger = logging.getLogger("py-website-capture")
 
     msg = "Trying to open JSON configuration file: {}"
-    logger.debug(msg.format(fileobject.name))
+    filename = getattr(fileobject, "name", fileobject.__repr__())
+    logger.debug(msg.format(filename))
 
     try:
         config = json.load(fileobject)

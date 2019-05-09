@@ -4,6 +4,7 @@ import copy
 import logging
 
 from selenium.common.exceptions import WebDriverException
+from website_capture.exceptions import InvalidPageSizeError, PageConfigError
 
 
 class BaseScreenshot(object):
@@ -46,7 +47,7 @@ class BaseScreenshot(object):
                     msg = ("Invalid size value, it should be a tuple of "
                             "exactly two integers "
                             "(width, height): {}").format(item)
-                    raise ValueError(msg)
+                    raise InvalidPageSizeError(msg)
 
         return sorted(list(sizes))
 
@@ -94,8 +95,8 @@ class BaseScreenshot(object):
 
         Given page item is passed to filename formating. So
         ``BaseScreenshot.DESTINATION_FILEPATH`` template may contains reference
-        to item values like ``foo_{name}.png``. Ensure template only references
-        values available for every page items.
+        to item values like ``foo_{name}.png``. You must ensure template only
+        references values available for every page items.
         """
         filename = config.get("filename", self.DESTINATION_FILEPATH)
 
@@ -112,11 +113,11 @@ class BaseScreenshot(object):
         """
         if not page.get("name", None):
             msg = "Page configuration must have a 'name' value."
-            raise KeyError(msg)
+            raise PageConfigError(msg)
 
         if not page.get("url", None):
             msg = "Page configuration must have an 'url' value."
-            raise KeyError(msg)
+            raise PageConfigError(msg)
 
         config = copy.deepcopy(page)
 
@@ -196,7 +197,7 @@ class BaseScreenshot(object):
             for page in pages:
                 if size in page.get("sizes", [self._default_size_value]):
                     config = self.get_page_config(page, size)
-                    print(config)
+                    #print(config)
                     options = self.get_interface_options(config)
                     interface = self.get_interface_instance(options)
 

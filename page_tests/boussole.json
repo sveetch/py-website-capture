@@ -1,0 +1,12 @@
+{
+    "SOURCES_PATH": "sources/sass/scss",
+    "LIBRARY_PATHS": [
+        "sources/sass/foundation",
+        "sources/sass/Sveetoy"
+    ],
+    "TARGET_PATH": "sources/css",
+    "OUTPUT_STYLES": "expanded",
+    "SOURCE_COMMENTS": false,
+    "SOURCE_MAP": false,
+    "EXCLUDES": []
+}

@@ -1,0 +1,15 @@
+{% extends "skeleton.html" %}
+
+{% block content -%}
+    <div class="row column">
+        <div class="v-space-short">
+            <h1 class="title-2 text-upper text-center underline short far">{{ page_title }}</h1>
+            <div class="box bluesapphire9 v-divider-normal">
+                {{ lipsum(n=3, html=True, min=30, max=70) }}
+            </div>
+            <div class="box whitesmoke9">
+                {{ lipsum(n=3, html=True, min=30, max=70) }}
+            </div>
+        </div>
+    </div>
+{%- endblock content %}

@@ -1,0 +1,50 @@
+# virtualenv
+.venv
+
+# Packaging
+build
+dist
+*.egg-info
+
+# sqlite DB
+db.sqlite3
+*.db
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.cache
+.pytest_cache
+nosetests.xml
+coverage.xml
+
+# VS Code
+.vscode
+
+# Mac Os
+.DS_Store
+
+# Temp files
+*~
+.~lock*
+
+# Swap files
+*.sw[po]
+
+# SASS
+.sass-cache
+
+# Translation catalogs
+*.mo
+*.pot
+
+# Avoid webassets cache
+.webassets-cache
+# Avoid to store any build from any environment
+_build
+# CSS source should always be built from Sass sources
+sources/css/*.css

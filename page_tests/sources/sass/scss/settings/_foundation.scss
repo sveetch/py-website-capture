@@ -1,0 +1,19 @@
+@import 'util/util';
+
+/*
+ * Foundation for sites settings
+ */
+
+// 1. Global
+// ---------
+
+$font-family-sanserif: sans-serif;
+
+$global-font-size: 16px;
+$global-weight-thin: 100;
+$global-weight-normal: 400;
+$global-weight-bold: 700;
+$global-weight-strong: 900;
+$body-font-family: $font-family-sanserif;
+$body-font-color: $whitesmoke2;
+$global-radius: rem-calc(8px);

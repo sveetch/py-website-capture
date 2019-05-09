@@ -19,3 +19,17 @@ class SettingsInvalidError(WebsiteCaptureBaseException):
     Exception to be raised when a settings is detected as invalid.
     """
     pass
+
+
+class PageConfigError(SettingsInvalidError):
+    """
+    Exception to be raised when a page configuration is invalid.
+    """
+    pass
+
+
+class InvalidPageSizeError(SettingsInvalidError):
+    """
+    Exception to be raised when an encountered size is invalid.
+    """
+    pass

@@ -1,0 +1,33 @@
+<!doctype html>
+<!--[if IE 9]><html class="lt-ie10" lang="{{ page_lang.language_name }}"> <![endif]-->
+<html class="no-js" lang="{{ page_lang.language_name }}" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block head_title %}{{ SITE.name }}{% endblock head_title %}</title>
+    <meta name="robots" content="follow, all">
+    {% block head_metas %}{% endblock head_metas %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block head_css -%}{% assets "main_css" %}
+        <link rel="stylesheet" href="{{ page_relative_position }}{{ ASSET_URL }}">
+    {% endassets %}{%- endblock head_css %}
+    {% block head_js %}{% endblock head_js %}
+</head>
+
+<body{% block body_attrs %}{% endblock body_attrs %}>
+    <div class="page-header block short">
+        <p class="brand title-1 text-center"><a href="{{ SITE.web_url }}">{{ SITE.name }}</a></p>
+    </div>
+
+    {% block body_content -%}
+    <div class="page-content">
+        {% block content -%}{%- endblock content %}
+    </div>
+    {%- endblock body_content %}
+
+    {% block foot_js -%}{% assets "main_js" -%}
+        <script src="{{ page_relative_position }}{{ ASSET_URL }}"></script>
+    {%- endassets %}{%- endblock foot_js %}
+</body>
+</html>

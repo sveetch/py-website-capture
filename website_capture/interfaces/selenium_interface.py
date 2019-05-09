@@ -4,6 +4,28 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 from website_capture.interfaces.base import BaseScreenshot
 
+"""
+TODO:
+    We have a way to get browser logs (at least errors), not we have to manage
+    them properly.
+
+    Firefox seems hard to exploit for console.log but at least there is
+    Javascript errors. Chrome should be more reliable for console.log.
+
+    For both browsers, logs are saved to an unique file (depending from capture
+    filename) that we will have to read and parse to collect useful stuff
+    inside many browser level log (warning, errors from driver are also
+    present). These log file may be removed optionally in the end of the
+    capture process.
+
+    Collected logs should be stored as JSON in a different and an unique file
+    based on capture filename.
+
+    To be clean, we need to separate screenshot job from log parsing in
+    different optional method but still called (optionally) from capture()
+    method. Then each page config should define what kind of job they require
+    (screenshot, log, custom task??).
+"""
 
 class SeleniumFirefoxScreenshot(BaseScreenshot):
     """
@@ -63,6 +85,7 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
 
         return {
             "options": options,
+            "service_log_path": config["log_path"],
         }
 
     def capture(self, interface, config):
@@ -71,5 +94,8 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
         interface.get(config["url"])
 
         interface.get_screenshot_as_file(config["destination"])
+
+        # The way to get log with chrome (not standardized by webdriver)
+        #print(interface.get_log('browser'))
 
         return config["destination"]
