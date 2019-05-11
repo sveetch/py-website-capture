@@ -182,10 +182,11 @@ class BaseScreenshot(object):
         """
         Proceed screenshot for every item
         """
+        built = []
+
         available_sizes = self.get_available_sizes(pages)
 
-        self.log.debug(f"available_sizes: {available_sizes}")
-
+        self.log.debug(f"Available sizes: {available_sizes}")
         for size in available_sizes:
             self.log.debug("Size: {}".format(self.get_size_repr(*size)))
 
@@ -197,7 +198,6 @@ class BaseScreenshot(object):
             for page in pages:
                 if size in page.get("sizes", [self._default_size_value]):
                     config = self.get_page_config(page, size)
-                    #print(config)
                     options = self.get_interface_options(config)
                     interface = self.get_interface_instance(options)
 
@@ -216,5 +216,7 @@ class BaseScreenshot(object):
                         self.tear_down_interface(interface)
                         raise e
                     else:
+                        built.append(path)
                         self.log.debug(f"  - Saved to : {path}")
                         self.tear_down_interface(interface)
+        return built

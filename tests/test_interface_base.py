@@ -203,39 +203,91 @@ def test_get_page_config_invalid(page):
 
 
 @pytest.mark.parametrize("page,size,size_dir,expected", [
+    # Without 'filename' option the "DESTINATION_FILEPATH" interface attribute
+    # should be used to create filenames
     (
         {
-            "name": "foo.png",
+            "name": "foo",
             "url": "some_url",
         },
         (1, 42),
         True,
         {
-            "name": "foo.png",
-            "url": "some_url",
+            "destination": "/basedir/1x42/foo_test.png",
+            "log_path": "/basedir/1x42/foo_test.png.driver.log",
+            "name": "foo",
             "size": (1, 42),
-            "destination": "/basedir/1x42/foo.png_base.png",
-            "log_path": "/basedir/1x42/foo.png_base.png.driver.log",
+            "url": "some_url",
         }
     ),
+    # When 'filename' option is given, it should be used to create filenames
+    # Also, additional options like "filename" and "ping" should be passed to
+    # final page config
     (
         {
-            "name": "foo.png",
             "filename": "bar.png",
+            "name": "foo",
+            "ping": "pong",
             "url": "some_url",
         },
         (1, 42),
         True,
         {
-            "name": "foo.png",
-            "url": "some_url",
+            "destination": "/basedir/1x42/bar.png",
+            "filename": "bar.png",
+            "log_path": "/basedir/1x42/bar.png.driver.log",
+            "name": "foo",
+            "ping": "pong",
             "size": (1, 42),
-            "destination": "/basedir/1x42/bar.png_base.png",
-            "log_path": "/basedir/1x42/bar.png_base.png.driver.log",
+            "url": "some_url",
         }
     ),
 ])
 def test_get_page_config(page, size, size_dir, expected):
     interface = BaseScreenshot("/basedir", size_dir=size_dir)
-    print(interface.get_page_config(page, size))
+    interface.DESTINATION_FILEPATH = "{name}_test.png"
     assert interface.get_page_config(page, size) == expected
+
+
+def test_get_interface_options():
+    """
+    Dummy test just for coverage since Base class don't implement nothing
+    """
+    interface = BaseScreenshot()
+    assert interface.get_interface_options({}) == {}
+
+
+def test_get_interface_class():
+    """
+    Dummy test just for coverage since Base class don't implement nothing
+    """
+    interface = BaseScreenshot()
+    assert interface.get_interface_class() == None
+
+
+def test_get_interface_instance():
+    """
+    Dummy test just for coverage since Base class don't implement nothing
+    """
+    interface = BaseScreenshot()
+
+    with pytest.raises(NotImplementedError):
+        interface.get_interface_instance({})
+
+
+@pytest.mark.parametrize("page,size,size_dir,expected", [
+    (
+        {
+            "name": "foo",
+            "url": "some_url",
+        },
+        (1, 42),
+        True,
+        "/basedir/1x42/foo_test.png",
+    ),
+])
+def test_capture(page, size, size_dir, expected):
+    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface.DESTINATION_FILEPATH = "{name}_test.png"
+    page_config = interface.get_page_config(page, size)
+    assert interface.capture(interface, page_config) == expected
