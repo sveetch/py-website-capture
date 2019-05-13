@@ -283,11 +283,67 @@ def test_get_interface_instance():
         },
         (1, 42),
         True,
-        "/basedir/1x42/foo_test.png",
+        "Pretending to load page: some_url",
+    ),
+])
+def test_load_page(page, size, size_dir, expected):
+    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface.DESTINATION_FILEPATH = "{name}_test.png"
+
+    config = interface.get_page_config(page, size)
+
+    assert interface.load_page(interface, config) == expected
+
+
+@pytest.mark.parametrize("page,size,size_dir,expected", [
+    # No task
+    (
+        {
+            "name": "foo",
+            "url": "some_url",
+        },
+        (1, 42),
+        True,
+        None,
+    ),
+    # Single screenshot task
+    (
+        {
+            "name": "foo",
+            "url": "some_url",
+            "tasks": ["screenshot"],
+        },
+        (1, 42),
+        True,
+        {
+            "name": "foo",
+            "url": "some_url",
+            "size": (1, 42),
+            "screenshot": "/basedir/1x42/foo_test.png",
+        },
+    ),
+    # Screenshot and log capture tasks
+    (
+        {
+            "name": "foo",
+            "url": "some_url",
+            "tasks": ["screenshot", "logs"],
+        },
+        (1, 42),
+        True,
+        {
+            "name": "foo",
+            "url": "some_url",
+            "size": (1, 42),
+            "screenshot": "/basedir/1x42/foo_test.png",
+            "logs": "/basedir/1x42/foo_test.png.driver.log",
+        },
     ),
 ])
 def test_capture(page, size, size_dir, expected):
     interface = BaseScreenshot("/basedir", size_dir=size_dir)
     interface.DESTINATION_FILEPATH = "{name}_test.png"
-    page_config = interface.get_page_config(page, size)
-    assert interface.capture(interface, page_config) == expected
+
+    config = interface.get_page_config(page, size)
+
+    assert interface.capture(interface, config) == expected

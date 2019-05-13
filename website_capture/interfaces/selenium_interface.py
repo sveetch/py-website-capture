@@ -56,15 +56,43 @@ class SeleniumFirefoxScreenshot(BaseScreenshot):
 
         return interface
 
-    def capture(self, interface, config):
-        super().capture(interface, config)
+    def load_page(self, interface, config):
+        """
+        Preview
+        """
+        super().load_page(interface, config)
 
-        interface.get(config["url"])
+        return interface.get(config["url"])
 
+    def task_screenshot(self, interface, config, response):
+        """
+        Preview
+        """
         el = interface.find_element_by_tag_name('body')
         el.screenshot(config["destination"])
 
         return config["destination"]
+
+    def task_logs(self, interface, config, response):
+        """
+        Preview
+        """
+        # TODO: Read driver log buffer and store browser logs
+        return config["log_path"]
+
+    #def capture(self, interface, config):
+        #"""
+        #TODO: Should not be needed anymore since it has been splitted in
+        #load_page, task_screenshot and task_logs
+        #"""
+        #super().capture(interface, config)
+
+        #interface.get(config["url"])
+
+        #el = interface.find_element_by_tag_name('body')
+        #el.screenshot(config["destination"])
+
+        #return config["destination"]
 
     def tear_down_interface(self, interface):
         super().tear_down_interface(interface)

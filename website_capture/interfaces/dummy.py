@@ -20,15 +20,12 @@ class DummyInterface(object):
 
 class DummyScreenshot(BaseScreenshot):
     """
-    Does not implement a real interface it just perform tasks and print out
-    some debugging information.
+    Does not implement a real interface with a working driver. It just perform
+    tasks and print out some debugging information. Mainly for dev and tests
+    usage.
     """
     INTERFACE_CLASS = DummyInterface
 
     def get_interface_instance(self, config):
         klass = self.get_interface_class()
         return klass()
-
-    def capture(self, interface, config):
-        path = super().capture(interface, config)
-        return path

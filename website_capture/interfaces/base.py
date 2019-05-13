@@ -25,6 +25,10 @@ class BaseScreenshot(object):
     DESTINATION_FILEPATH = "{name}_base.png"
     INTERFACE_CLASS = None
     _default_size_value = (0, 0) # Do not change this
+    AVAILABLE_PAGE_TASKS = {
+        "screenshot": "task_screenshot",
+        "logs": "task_logs",
+    }
 
     def __init__(self, basedir="", headless=True, size_dir=True):
         self.headless = headless
@@ -72,8 +76,7 @@ class BaseScreenshot(object):
 
     def set_interface_size(self, interface, config):
         """
-        Should set interface window size if given page size is not
-        null (``0x0``).
+        Should set browser window to given size from config.
         """
         pass
 
@@ -147,6 +150,29 @@ class BaseScreenshot(object):
         msg = "Your 'BaseScreenshot' object must implement an interface"
         raise NotImplementedError(msg)
 
+    def load_page(self, interface, config):
+        """
+        Load given page url into given interface
+        """
+        self.log.info("🔹 Getting page for: {} ({})".format(
+            config["name"],
+            self.get_size_repr(*config["size"]),
+        ))
+
+        return "Pretending to load page: {}".format(config["url"])
+
+    def task_screenshot(self, interface, config, response):
+        """
+        Should screenshot loaded page.
+        """
+        return config["destination"]
+
+    def task_logs(self, interface, config, response):
+        """
+        Should get browser logs from loaded page
+        """
+        return config["log_path"]
+
     def capture(self, interface, config):
         """
         Perform screenshot with given interface for given page configuration.
@@ -163,12 +189,33 @@ class BaseScreenshot(object):
               as "a capture theses things from page" and cut "things" into
               individual methods so we can choose what thing jobs to perform;
         """
-        self.log.info("🔹 Getting page for: {} ({})".format(
-            config["name"],
-            self.get_size_repr(*config["size"]),
-        ))
+        tasks = [task for task in config.get("tasks", []) if (task in self.AVAILABLE_PAGE_TASKS)]
 
-        return config["destination"]
+        # Perform tasks if there is any valid ones
+        if tasks:
+            payload = {
+                "name": config["name"],
+                "url": config["url"],
+                "size": config["size"],
+            }
+
+            response = self.load_page(interface, config)
+
+            for task in tasks:
+                payload[task] = getattr(
+                    self,
+                    self.AVAILABLE_PAGE_TASKS[task]
+                )(interface, config, response)
+
+            return payload
+        # No valid task found
+        else:
+            self.log.warning("🔹 No enabled tasks for page: {} ({})".format(
+                config["name"],
+                self.get_size_repr(*config["size"]),
+            ))
+            return None
+
 
     def tear_down_interface(self, interface):
         """
@@ -178,11 +225,79 @@ class BaseScreenshot(object):
         """
         self.log.debug("Closing interface")
 
-    def run(self, pages):
+    def page_job(self, size, page):
         """
-        Proceed screenshot for every item
+        Perform page job for given page with given size
         """
         built = []
+        error_logs = []
+
+        config = self.get_page_config(page, size)
+        options = self.get_interface_options(config)
+        interface = self.get_interface_instance(options)
+
+        if size != self._default_size_value:
+            self.set_interface_size(interface, config)
+
+        try:
+            payload = self.capture(interface, config)
+        # Driver error is not critical to finish every jobs, it is
+        # logged in and job queue continue
+        except WebDriverException as e:
+            self.tear_down_interface(interface)
+            msg = ("Unable to reach page or unexpected error "
+                    "with: {}")
+            self.log.error(msg.format(config["url"]))
+            self.log.error(e)
+            error_logs.append({
+                "name": config["name"],
+                "url": config["url"],
+                "size": size,
+                "msg": msg,
+                "error": e,
+            })
+        # Unexpected error kind is assumed to be critical
+        except Exception as e:
+            self.tear_down_interface(interface)
+            raise e
+        # Job succeed
+        else:
+            self.tear_down_interface(interface)
+            if payload:
+                built.append(payload)
+                if "screenshot" in payload:
+                    self.log.debug("  - Saved screenshot to : {}".format(payload["screenshot"]))
+                if "logs" in payload:
+                    self.log.debug("  - Saved screenshot to : {}".format(payload["logs"]))
+
+        return built, error_logs
+
+    def perform_size_pages(self, size, pages):
+        """
+        Perform page job for every page with given size
+        """
+        built = []
+        error_logs = []
+
+        # Create destination dir if not already exists
+        sizedir = self.get_destination_dir(size)
+        if not os.path.exists(sizedir):
+            os.makedirs(sizedir)
+
+        for page in pages:
+            if size in page.get("sizes", [self._default_size_value]):
+                paths, errors = self.page_job(size, page)
+                built.extend(paths)
+                error_logs.extend(errors)
+
+        return built, error_logs
+
+    def run(self, pages):
+        """
+        Proceed capture for every item
+        """
+        built = []
+        error_logs = []
 
         available_sizes = self.get_available_sizes(pages)
 
@@ -190,33 +305,8 @@ class BaseScreenshot(object):
         for size in available_sizes:
             self.log.debug("Size: {}".format(self.get_size_repr(*size)))
 
-            # Create destination dir if not already exists
-            sizedir = self.get_destination_dir(size)
-            if not os.path.exists(sizedir):
-                os.makedirs(sizedir)
+            paths, errors = self.perform_size_pages(size, pages)
+            built.extend(paths)
+            error_logs.extend(errors)
 
-            for page in pages:
-                if size in page.get("sizes", [self._default_size_value]):
-                    config = self.get_page_config(page, size)
-                    options = self.get_interface_options(config)
-                    interface = self.get_interface_instance(options)
-
-                    if size != self._default_size_value:
-                        self.set_interface_size(interface, config)
-
-                    try:
-                        path = self.capture(interface, config)
-                    except WebDriverException as e:
-                        self.tear_down_interface(interface)
-                        msg = ("Unable to reach page or unexpected error "
-                                "with: {}")
-                        self.log.error(msg.format(config["url"]))
-                        self.log.error(e)
-                    except Exception as e:
-                        self.tear_down_interface(interface)
-                        raise e
-                    else:
-                        built.append(path)
-                        self.log.debug(f"  - Saved to : {path}")
-                        self.tear_down_interface(interface)
-        return built
+        return built, error_logs
