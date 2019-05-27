@@ -22,6 +22,11 @@ SAMPLE_PAGES = [
         destination="javascript-error.basic.html",
     ),
     BasicPage(
+        title="Every error cases",
+        template_name="every-logs.basic.html",
+        destination="every-logs.basic.html",
+    ),
+    BasicPage(
         title="Basic lorem ipsum",
         template_name="lorem-ipsum.basic.html",
         destination="lorem-ipsum.basic.html",

@@ -55,7 +55,6 @@ class JsonIndex(Index):
             [1440, 768],
         ]
 
-        # TODO: Slugify title for name since it causes troubles with filename
         pages_map = []
         for page in self.pages:
             pages_map.append({
@@ -63,6 +62,7 @@ class JsonIndex(Index):
                 "url": os.path.join(self.env.globals["SITE"]["web_url"],
                                     page.destination),
                 "sizes": sizes,
+                "tasks": ["screenshot", "logs"]
             })
 
         content = {

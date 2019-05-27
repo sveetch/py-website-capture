@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import os
 import copy
+import io
+import json
 import logging
+import os
 
 from selenium.common.exceptions import WebDriverException
 from website_capture.exceptions import InvalidPageSizeError, PageConfigError
@@ -127,7 +129,8 @@ class BaseScreenshot(object):
         config["size"] = size
 
         config["destination"] = self.get_file_destination(config)
-        config["log_path"] = ".".join([config["destination"], "driver", "log"])
+        config["interface_log_path"] = ".".join([config["destination"], "driver", "log"])
+        config["browser_log_path"] = ".".join([config["destination"], "browser", "json"])
 
         return config
 
@@ -143,7 +146,7 @@ class BaseScreenshot(object):
         """
         return self.INTERFACE_CLASS
 
-    def get_interface_instance(self, config):
+    def get_interface_instance(self, options, config):
         """
         Return interface instance pre configured with given config object.
         """
@@ -171,7 +174,7 @@ class BaseScreenshot(object):
         """
         Should get browser logs from loaded page
         """
-        return config["log_path"]
+        return {}
 
     def capture(self, interface, config):
         """
@@ -179,15 +182,6 @@ class BaseScreenshot(object):
 
         This should allways return path where screenshot file has been
         effectively writed to.
-
-        TODO:
-            * Capture browser console logs (errors, warnings, etc.. occuring
-              during page loading/rendering, not driver, etc.. logs) in an
-              optional file. Need tests on various behavior with some dummy
-              pages to reproduce cases.
-            * Start moving screenshot code into its own method, so capture stay
-              as "a capture theses things from page" and cut "things" into
-              individual methods so we can choose what thing jobs to perform;
         """
         tasks = [task for task in config.get("tasks", []) if (task in self.AVAILABLE_PAGE_TASKS)]
 
@@ -217,7 +211,7 @@ class BaseScreenshot(object):
             return None
 
 
-    def tear_down_interface(self, interface):
+    def tear_down_interface(self, interface, config):
         """
         Implement this to close descriptor/pointer object after end of
         each ``BaseScreenshot.run()`` job, especially useful to close
@@ -234,7 +228,7 @@ class BaseScreenshot(object):
 
         config = self.get_page_config(page, size)
         options = self.get_interface_options(config)
-        interface = self.get_interface_instance(options)
+        interface = self.get_interface_instance(options, config)
 
         if size != self._default_size_value:
             self.set_interface_size(interface, config)
@@ -244,7 +238,7 @@ class BaseScreenshot(object):
         # Driver error is not critical to finish every jobs, it is
         # logged in and job queue continue
         except WebDriverException as e:
-            self.tear_down_interface(interface)
+            self.tear_down_interface(interface, config)
             msg = ("Unable to reach page or unexpected error "
                     "with: {}")
             self.log.error(msg.format(config["url"]))
@@ -258,17 +252,22 @@ class BaseScreenshot(object):
             })
         # Unexpected error kind is assumed to be critical
         except Exception as e:
-            self.tear_down_interface(interface)
+            self.tear_down_interface(interface, config)
             raise e
         # Job succeed
         else:
-            self.tear_down_interface(interface)
+            self.tear_down_interface(interface, config)
             if payload:
                 built.append(payload)
+                # Should live in dedicated task method
                 if "screenshot" in payload:
-                    self.log.debug("  - Saved screenshot to : {}".format(payload["screenshot"]))
+                    self.log.debug("  - Saved screenshot to : {}".format(
+                        config["destination"]
+                    ))
                 if "logs" in payload:
-                    self.log.debug("  - Saved screenshot to : {}".format(payload["logs"]))
+                    self.log.debug("  - Saved browser log to : {}".format(
+                        config["browser_log_path"]
+                    ))
 
         return built, error_logs
 
@@ -310,3 +309,68 @@ class BaseScreenshot(object):
             error_logs.extend(errors)
 
         return built, error_logs
+
+
+class LogManagerMixin:
+    """
+    A mixin for interface to get browser logs from driver logs.
+
+    TODO:
+        * test coverage;
+        * a convenient method to store logs to a file, which could be called
+          at the end of jobs;
+    """
+    def get_driver_logs_content(self, interface, config, response):
+        """
+        Get driver log content
+        """
+        with io.open(config["interface_log_path"], "r") as fp:
+            content = fp.read()
+
+        return content
+
+    def remove_driver_logs(self, interface, config):
+        """
+        Will remove driver log file.
+
+        NOTE:
+            Should be called only after interface has been closed.
+        """
+        if os.path.exists(config["interface_log_path"]):
+            os.remove(config["interface_log_path"])
+
+    def store_browser_logs(self, interface, config, payload):
+        """
+        Get driver log content
+        """
+        with io.open(config["browser_log_path"], "w") as fp:
+            json.dump(payload, fp, indent=4)
+
+        return config["browser_log_path"]
+
+    def parse_logs(self, interface, config, content):
+        """
+        Should parse relevant logs from given content.
+        """
+        return []
+
+    def task_logs(self, interface, config, response):
+        """
+        Store browser logs from driver logs.
+
+        NOTE:
+            Keep in mind that getting logs before closing interface won't be
+            able to capture logs from "unload" browser events (like when a
+            window is closed).
+        """
+        payload = {
+            "name": config["name"],
+            "url": config["url"],
+            "size": config["size"],
+        }
+
+        content = self.get_driver_logs_content(interface, config, response)
+
+        payload["logs"] = self.parse_logs(interface, config, content)
+
+        return payload

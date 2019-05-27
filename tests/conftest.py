@@ -24,7 +24,7 @@ def insert_basedir():
     """
     def curry_func(basedir, payload, fields=["logs", "screenshot"]):
         for item in fields:
-            if item in payload:
+            if item in payload and isinstance(payload[item], str):
                 payload[item] = os.path.join(basedir, payload[item])
         return payload
 

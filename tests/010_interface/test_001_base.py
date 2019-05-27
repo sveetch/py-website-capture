@@ -214,7 +214,8 @@ def test_get_page_config_invalid(page):
         True,
         {
             "destination": "/basedir/1x42/foo_test.png",
-            "log_path": "/basedir/1x42/foo_test.png.driver.log",
+            "interface_log_path": "/basedir/1x42/foo_test.png.driver.log",
+            "browser_log_path": "/basedir/1x42/foo_test.png.browser.json",
             "name": "foo",
             "size": (1, 42),
             "url": "some_url",
@@ -235,7 +236,8 @@ def test_get_page_config_invalid(page):
         {
             "destination": "/basedir/1x42/bar.png",
             "filename": "bar.png",
-            "log_path": "/basedir/1x42/bar.png.driver.log",
+            "interface_log_path": "/basedir/1x42/bar.png.driver.log",
+            "browser_log_path": "/basedir/1x42/bar.png.browser.json",
             "name": "foo",
             "ping": "pong",
             "size": (1, 42),
@@ -272,7 +274,7 @@ def test_get_interface_instance():
     interface = BaseScreenshot()
 
     with pytest.raises(NotImplementedError):
-        interface.get_interface_instance({})
+        interface.get_interface_instance({}, {})
 
 
 @pytest.mark.parametrize("page,size,size_dir,expected", [
@@ -336,7 +338,7 @@ def test_load_page(page, size, size_dir, expected):
             "url": "some_url",
             "size": (1, 42),
             "screenshot": "/basedir/1x42/foo_test.png",
-            "logs": "/basedir/1x42/foo_test.png.driver.log",
+            "logs": {},
         },
     ),
 ])

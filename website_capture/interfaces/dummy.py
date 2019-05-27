@@ -26,6 +26,6 @@ class DummyScreenshot(BaseScreenshot):
     """
     INTERFACE_CLASS = DummyInterface
 
-    def get_interface_instance(self, config):
+    def get_interface_instance(self, options, config):
         klass = self.get_interface_class()
         return klass()

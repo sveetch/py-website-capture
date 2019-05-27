@@ -17,7 +17,7 @@ def test_get_interface_class():
 def test_get_interface_instance():
     engine = DummyScreenshot()
 
-    assert isinstance(engine.get_interface_instance({}),
+    assert isinstance(engine.get_interface_instance({}, {}),
                       DummyInterface) == True
 
 
@@ -47,7 +47,7 @@ def test_capture(page, size, size_dir, expected):
 
     config = engine.get_page_config(page, size)
     options = engine.get_interface_options(config)
-    interface = engine.get_interface_instance(options)
+    interface = engine.get_interface_instance(options, config)
 
     assert engine.capture(engine, config) == expected
 
@@ -117,7 +117,7 @@ def test_page_job(temp_builds_dir, insert_basedir, page, size_dir, expected):
                 "url": "some_ping",
                 "size": (1, 42),
                 "screenshot": "1x42/ping_test.png",
-                "logs": "1x42/ping_test.png.driver.log",
+                "logs": {},
             },
         ],
     ),

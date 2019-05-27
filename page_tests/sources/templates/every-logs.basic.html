@@ -1,0 +1,21 @@
+{% extends "skeleton.html" %}
+
+{% block content -%}
+    <div class="row column">
+        <div class="v-space-short">
+            <h1 class="title-2 text-upper text-center underline short far">{{ page_title }}</h1>
+            <div class="v-space-short text-center">
+                <p>This sample performs a single Javascript error surrounded by console log message.</p>
+            </div>
+        </div>
+    </div>
+{%- endblock content %}
+
+{% block foot_js -%}
+    {{ super() }}
+    <script>
+        console.log("Before error");
+        var foo = bar;
+        console.log("After error");
+    </script>
+{%- endblock foot_js %}
