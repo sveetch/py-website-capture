@@ -1,9 +1,9 @@
-from website_capture.interfaces.base import BaseScreenshot
+from website_capture.interfaces.base import BaseInterface
 
 
-class DummyInterface(object):
+class DummyDriver(object):
     """
-    Fake interface for dummy test usage
+    Fake driver for dummy test usage
     """
     def visit(self, url):
         return f"Pretend to visit url: {url}"
@@ -18,14 +18,14 @@ class DummyInterface(object):
         return path
 
 
-class DummyScreenshot(BaseScreenshot):
+class DummyInterface(BaseInterface):
     """
     Does not implement a real interface with a working driver. It just perform
     tasks and print out some debugging information. Mainly for dev and tests
     usage.
     """
-    INTERFACE_CLASS = DummyInterface
+    DRIVER_CLASS = DummyDriver
 
-    def get_interface_instance(self, options, config):
-        klass = self.get_interface_class()
+    def get_driver_instance(self, options, config):
+        klass = self.get_driver_class()
         return klass()

@@ -9,9 +9,9 @@ from selenium.common.exceptions import WebDriverException
 from website_capture.exceptions import InvalidPageSizeError, PageConfigError
 
 
-class BaseScreenshot(object):
+class BaseInterface(object):
     """
-    Base screenshoter interface does not implement any interface, it's just a
+    Base screenshoter interface does not implement any driver, it's just a
     task runner for given page items.
 
     Keyword Arguments:
@@ -21,11 +21,11 @@ class BaseScreenshot(object):
         size_dir (string): Enable or not behavior to create a subdirectory for
             each different size used from page configurations. Default is True.
             Remember to add a size into template
-            ``BaseScreenshot.DESTINATION_FILEPATH`` if you disable this and you
+            ``BaseInterface.DESTINATION_FILEPATH`` if you disable this and you
             have more than one size used in your pages.
     """
     DESTINATION_FILEPATH = "{name}_base.png"
-    INTERFACE_CLASS = None
+    DRIVER_CLASS = None
     _default_size_value = (0, 0) # Do not change this
     AVAILABLE_PAGE_TASKS = {
         "screenshot": "task_screenshot",
@@ -67,7 +67,7 @@ class BaseScreenshot(object):
 
         Return:
             string: Size representation such as ``WIDTHxHEIGHT`` if size is
-            not equal to empty size ``BaseScreenshot._default_size_value``,
+            not equal to empty size ``BaseInterface._default_size_value``,
             else return ``Default``.
         """
         size_repr = "Default"
@@ -75,12 +75,6 @@ class BaseScreenshot(object):
             size_repr = "{}x{}".format(width, height)
 
         return size_repr
-
-    def set_interface_size(self, interface, config):
-        """
-        Should set browser window to given size from config.
-        """
-        pass
 
     def get_destination_dir(self, size):
         """
@@ -99,7 +93,7 @@ class BaseScreenshot(object):
         Return screenshot file destination path.
 
         Given page item is passed to filename formating. So
-        ``BaseScreenshot.DESTINATION_FILEPATH`` template may contains reference
+        ``BaseInterface.DESTINATION_FILEPATH`` template may contains reference
         to item values like ``foo_{name}.png``. You must ensure template only
         references values available for every page items.
         """
@@ -114,7 +108,8 @@ class BaseScreenshot(object):
         """
         Validate and return page configuration.
 
-        Base configuration is given page item plus some additional context.
+        This is an extended version of page item options from configuration
+        file with additional job context.
         """
         if not page.get("name", None):
             msg = "Page configuration must have a 'name' value."
@@ -129,33 +124,48 @@ class BaseScreenshot(object):
         config["size"] = size
 
         config["destination"] = self.get_file_destination(config)
-        config["interface_log_path"] = ".".join([config["destination"], "driver", "log"])
+        config["driver_log_path"] = ".".join([config["destination"], "driver", "log"])
         config["browser_log_path"] = ".".join([config["destination"], "browser", "json"])
 
         return config
 
-    def get_interface_options(self, config):
+    def get_driver_options(self, config):
         """
-        Should return available option object to pre configure your instance.
+        Should return available option object to pre configure your driver
+        instance.
         """
         return {}
 
-    def get_interface_class(self):
+    def get_driver_class(self):
         """
-        Return interface object class.
+        Return driver object class.
         """
-        return self.INTERFACE_CLASS
+        return self.DRIVER_CLASS
 
-    def get_interface_instance(self, options, config):
+    def get_driver_instance(self, options, config):
         """
-        Return interface instance pre configured with given config object.
+        Return driver instance pre configured with given config object.
         """
-        msg = "Your 'BaseScreenshot' object must implement an interface"
+        msg = "Your 'BaseInterface' object must implement a driver."
         raise NotImplementedError(msg)
 
-    def load_page(self, interface, config):
+    def tear_down_driver(self, driver, config):
         """
-        Load given page url into given interface
+        Implement this to close descriptor/pointer object after end of
+        each ``BaseInterface.run()`` job, especially useful to close
+        driver when page capture has been done.
+        """
+        self.log.debug("Closing driver")
+
+    def set_browser_size(self, driver, config):
+        """
+        Should set browser window to given size from config.
+        """
+        pass
+
+    def load_page(self, driver, config):
+        """
+        Load given page url into given driver
         """
         self.log.info("🔹 Getting page for: {} ({})".format(
             config["name"],
@@ -164,21 +174,21 @@ class BaseScreenshot(object):
 
         return "Pretending to load page: {}".format(config["url"])
 
-    def task_screenshot(self, interface, config, response):
+    def task_screenshot(self, driver, config, response):
         """
         Should screenshot loaded page.
         """
         return config["destination"]
 
-    def task_logs(self, interface, config, response):
+    def task_logs(self, driver, config, response):
         """
         Should get browser logs from loaded page
         """
         return {}
 
-    def capture(self, interface, config):
+    def capture(self, driver, config):
         """
-        Perform screenshot with given interface for given page configuration.
+        Perform screenshot with given driver for given page configuration.
 
         This should allways return path where screenshot file has been
         effectively writed to.
@@ -193,13 +203,13 @@ class BaseScreenshot(object):
                 "size": config["size"],
             }
 
-            response = self.load_page(interface, config)
+            response = self.load_page(driver, config)
 
             for task in tasks:
                 payload[task] = getattr(
                     self,
                     self.AVAILABLE_PAGE_TASKS[task]
-                )(interface, config, response)
+                )(driver, config, response)
 
             return payload
         # No valid task found
@@ -210,15 +220,6 @@ class BaseScreenshot(object):
             ))
             return None
 
-
-    def tear_down_interface(self, interface, config):
-        """
-        Implement this to close descriptor/pointer object after end of
-        each ``BaseScreenshot.run()`` job, especially useful to close
-        interface when page capture has been done.
-        """
-        self.log.debug("Closing interface")
-
     def page_job(self, size, page):
         """
         Perform page job for given page with given size
@@ -227,18 +228,18 @@ class BaseScreenshot(object):
         error_logs = []
 
         config = self.get_page_config(page, size)
-        options = self.get_interface_options(config)
-        interface = self.get_interface_instance(options, config)
+        options = self.get_driver_options(config)
+        driver = self.get_driver_instance(options, config)
 
         if size != self._default_size_value:
-            self.set_interface_size(interface, config)
+            self.set_browser_size(driver, config)
 
         try:
-            payload = self.capture(interface, config)
+            payload = self.capture(driver, config)
         # Driver error is not critical to finish every jobs, it is
         # logged in and job queue continue
         except WebDriverException as e:
-            self.tear_down_interface(interface, config)
+            self.tear_down_driver(driver, config)
             msg = ("Unable to reach page or unexpected error "
                     "with: {}")
             self.log.error(msg.format(config["url"]))
@@ -252,11 +253,11 @@ class BaseScreenshot(object):
             })
         # Unexpected error kind is assumed to be critical
         except Exception as e:
-            self.tear_down_interface(interface, config)
+            self.tear_down_driver(driver, config)
             raise e
         # Job succeed
         else:
-            self.tear_down_interface(interface, config)
+            self.tear_down_driver(driver, config)
             if payload:
                 built.append(payload)
                 # Should live in dedicated task method
@@ -320,26 +321,26 @@ class LogManagerMixin:
         * a convenient method to store logs to a file, which could be called
           at the end of jobs;
     """
-    def get_driver_logs_content(self, interface, config, response):
+    def get_driver_logs_content(self, driver, config, response):
         """
         Get driver log content
         """
-        with io.open(config["interface_log_path"], "r") as fp:
+        with io.open(config["driver_log_path"], "r") as fp:
             content = fp.read()
 
         return content
 
-    def remove_driver_logs(self, interface, config):
+    def remove_driver_logs(self, driver, config):
         """
         Will remove driver log file.
 
         NOTE:
-            Should be called only after interface has been closed.
+            Should be called only after driver has been closed.
         """
-        if os.path.exists(config["interface_log_path"]):
-            os.remove(config["interface_log_path"])
+        if os.path.exists(config["driver_log_path"]):
+            os.remove(config["driver_log_path"])
 
-    def store_browser_logs(self, interface, config, payload):
+    def store_browser_logs(self, driver, config, payload):
         """
         Get driver log content
         """
@@ -348,18 +349,18 @@ class LogManagerMixin:
 
         return config["browser_log_path"]
 
-    def parse_logs(self, interface, config, content):
+    def parse_logs(self, driver, config, content):
         """
         Should parse relevant logs from given content.
         """
         return []
 
-    def task_logs(self, interface, config, response):
+    def task_logs(self, driver, config, response):
         """
         Store browser logs from driver logs.
 
         NOTE:
-            Keep in mind that getting logs before closing interface won't be
+            Keep in mind that getting logs before closing driver won't be
             able to capture logs from "unload" browser events (like when a
             window is closed).
         """
@@ -369,8 +370,8 @@ class LogManagerMixin:
             "size": config["size"],
         }
 
-        content = self.get_driver_logs_content(interface, config, response)
+        content = self.get_driver_logs_content(driver, config, response)
 
-        payload["logs"] = self.parse_logs(interface, config, content)
+        payload["logs"] = self.parse_logs(driver, config, content)
 
         return payload

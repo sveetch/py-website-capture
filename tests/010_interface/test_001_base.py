@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from website_capture.interfaces.base import BaseScreenshot
+from website_capture.interfaces.base import BaseInterface
 from website_capture.exceptions import InvalidPageSizeError, PageConfigError
 
 
@@ -12,11 +12,11 @@ from website_capture.exceptions import InvalidPageSizeError, PageConfigError
     # Empty or no sizes provided, return at least the default size
     (
         [{"sizes": []}],
-        [BaseScreenshot._default_size_value]
+        [BaseInterface._default_size_value]
     ),
     (
         [{}],
-        [BaseScreenshot._default_size_value]
+        [BaseInterface._default_size_value]
     ),
     # Single
     (
@@ -24,7 +24,7 @@ from website_capture.exceptions import InvalidPageSizeError, PageConfigError
             {"sizes": [(1, 42)]}
         ],
         [
-            BaseScreenshot._default_size_value,
+            BaseInterface._default_size_value,
             (1, 42),
         ]
     ),
@@ -48,7 +48,7 @@ from website_capture.exceptions import InvalidPageSizeError, PageConfigError
             },
         ],
         [
-            BaseScreenshot._default_size_value,
+            BaseInterface._default_size_value,
             (1, 42),
         ]
     ),
@@ -81,7 +81,7 @@ from website_capture.exceptions import InvalidPageSizeError, PageConfigError
             },
         ],
         [
-            BaseScreenshot._default_size_value,
+            BaseInterface._default_size_value,
             (1, 42),
             (42, 42),
             (300, 1444),
@@ -93,7 +93,7 @@ def test_get_available_sizes(pages, expected):
     """
     All defined sizes through every pages should be registered
     """
-    interface = BaseScreenshot()
+    interface = BaseInterface()
 
     assert interface.get_available_sizes(pages) == expected
 
@@ -109,7 +109,7 @@ def test_get_available_sizes_invalid(pages):
     Size is always an iterable of two items, every other size kind should
     raise an exception
     """
-    interface = BaseScreenshot()
+    interface = BaseInterface()
 
     with pytest.raises(InvalidPageSizeError):
         interface.get_available_sizes(pages)
@@ -117,8 +117,8 @@ def test_get_available_sizes_invalid(pages):
 
 @pytest.mark.parametrize("width,height,expected", [
     (
-        BaseScreenshot._default_size_value[0],
-        BaseScreenshot._default_size_value[1],
+        BaseInterface._default_size_value[0],
+        BaseInterface._default_size_value[1],
         "Default"
     ),
     (1, 42, "1x42"),
@@ -130,18 +130,18 @@ def test_get_size_repr(width, height, expected):
     Size representation from given width and height is always a string like
     ``WIDTHxHEIGHT``. Default size value is always representated as "Default"
     """
-    interface = BaseScreenshot()
+    interface = BaseInterface()
 
     assert interface.get_size_repr(width, height) == expected
 
 
 @pytest.mark.parametrize("size,size_dir,expected", [
-    (BaseScreenshot._default_size_value, True, "/basedir/Default"),
+    (BaseInterface._default_size_value, True, "/basedir/Default"),
     ((1, 42), True, "/basedir/1x42"),
     ((1, 42), False, "/basedir"),
 ])
 def test_get_destination_dir(size, size_dir, expected):
-    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface = BaseInterface("/basedir", size_dir=size_dir)
 
     assert interface.get_destination_dir(size) == expected
 
@@ -150,7 +150,7 @@ def test_get_destination_dir(size, size_dir, expected):
     (
         {
             "filename": "foo.png",
-            "size": BaseScreenshot._default_size_value,
+            "size": BaseInterface._default_size_value,
         },
         True,
         "/basedir/Default/foo.png"
@@ -173,7 +173,7 @@ def test_get_destination_dir(size, size_dir, expected):
     ),
 ])
 def test_get_file_destination(config, size_dir, expected):
-    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface = BaseInterface("/basedir", size_dir=size_dir)
 
     assert interface.get_file_destination(config) == expected
 
@@ -196,7 +196,7 @@ def test_get_page_config_invalid(page):
     """
     A config page item require some mandatory fields
     """
-    interface = BaseScreenshot()
+    interface = BaseInterface()
 
     with pytest.raises(PageConfigError):
         assert interface.get_page_config(page, (1, 42))
@@ -214,7 +214,7 @@ def test_get_page_config_invalid(page):
         True,
         {
             "destination": "/basedir/1x42/foo_test.png",
-            "interface_log_path": "/basedir/1x42/foo_test.png.driver.log",
+            "driver_log_path": "/basedir/1x42/foo_test.png.driver.log",
             "browser_log_path": "/basedir/1x42/foo_test.png.browser.json",
             "name": "foo",
             "size": (1, 42),
@@ -236,7 +236,7 @@ def test_get_page_config_invalid(page):
         {
             "destination": "/basedir/1x42/bar.png",
             "filename": "bar.png",
-            "interface_log_path": "/basedir/1x42/bar.png.driver.log",
+            "driver_log_path": "/basedir/1x42/bar.png.driver.log",
             "browser_log_path": "/basedir/1x42/bar.png.browser.json",
             "name": "foo",
             "ping": "pong",
@@ -246,35 +246,35 @@ def test_get_page_config_invalid(page):
     ),
 ])
 def test_get_page_config(page, size, size_dir, expected):
-    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface = BaseInterface("/basedir", size_dir=size_dir)
     interface.DESTINATION_FILEPATH = "{name}_test.png"
     assert interface.get_page_config(page, size) == expected
 
 
-def test_get_interface_options():
+def test_get_driver_options():
     """
     Dummy test just for coverage since Base class don't implement nothing
     """
-    interface = BaseScreenshot()
-    assert interface.get_interface_options({}) == {}
+    interface = BaseInterface()
+    assert interface.get_driver_options({}) == {}
 
 
-def test_get_interface_class():
+def test_get_driver_class():
     """
     Dummy test just for coverage since Base class don't implement nothing
     """
-    interface = BaseScreenshot()
-    assert interface.get_interface_class() == None
+    interface = BaseInterface()
+    assert interface.get_driver_class() == None
 
 
-def test_get_interface_instance():
+def test_get_driver_instance():
     """
     Dummy test just for coverage since Base class don't implement nothing
     """
-    interface = BaseScreenshot()
+    interface = BaseInterface()
 
     with pytest.raises(NotImplementedError):
-        interface.get_interface_instance({}, {})
+        interface.get_driver_instance({}, {})
 
 
 @pytest.mark.parametrize("page,size,size_dir,expected", [
@@ -289,12 +289,14 @@ def test_get_interface_instance():
     ),
 ])
 def test_load_page(page, size, size_dir, expected):
-    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface = BaseInterface("/basedir", size_dir=size_dir)
     interface.DESTINATION_FILEPATH = "{name}_test.png"
+    # For BaseInterface test we don't need a real driver
+    driver = object()
 
     config = interface.get_page_config(page, size)
 
-    assert interface.load_page(interface, config) == expected
+    assert interface.load_page(driver, config) == expected
 
 
 @pytest.mark.parametrize("page,size,size_dir,expected", [
@@ -343,9 +345,11 @@ def test_load_page(page, size, size_dir, expected):
     ),
 ])
 def test_capture(page, size, size_dir, expected):
-    interface = BaseScreenshot("/basedir", size_dir=size_dir)
+    interface = BaseInterface("/basedir", size_dir=size_dir)
     interface.DESTINATION_FILEPATH = "{name}_test.png"
+    # For BaseInterface test we don't need a real driver
+    driver = object()
 
     config = interface.get_page_config(page, size)
 
-    assert interface.capture(interface, config) == expected
+    assert interface.capture(driver, config) == expected

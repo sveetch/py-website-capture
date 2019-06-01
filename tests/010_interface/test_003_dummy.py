@@ -5,20 +5,20 @@ import os
 
 import pytest
 
-from website_capture.interfaces.dummy import DummyInterface, DummyScreenshot
+from website_capture.interfaces.dummy import DummyDriver, DummyInterface
 
 
-def test_get_interface_class():
-    engine = DummyScreenshot()
+def test_get_driver_class():
+    engine = DummyInterface()
 
-    assert engine.get_interface_class() == DummyInterface
+    assert engine.get_driver_class() == DummyDriver
 
 
-def test_get_interface_instance():
-    engine = DummyScreenshot()
+def test_get_driver_instance():
+    engine = DummyInterface()
 
-    assert isinstance(engine.get_interface_instance({}, {}),
-                      DummyInterface) == True
+    assert isinstance(engine.get_driver_instance({}, {}),
+                      DummyDriver) == True
 
 
 @pytest.mark.parametrize("page,size,size_dir,expected", [
@@ -42,12 +42,12 @@ def test_capture(page, size, size_dir, expected):
     """
     'capture' method should perform tasks for given page
     """
-    engine = DummyScreenshot("/basedir", size_dir=size_dir)
+    engine = DummyInterface("/basedir", size_dir=size_dir)
     engine.DESTINATION_FILEPATH = "{name}_test.png"
 
     config = engine.get_page_config(page, size)
-    options = engine.get_interface_options(config)
-    interface = engine.get_interface_instance(options, config)
+    options = engine.get_driver_options(config)
+    driver = engine.get_driver_instance(options, config)
 
     assert engine.capture(engine, config) == expected
 
@@ -78,7 +78,7 @@ def test_page_job(temp_builds_dir, insert_basedir, page, size_dir, expected):
     required_size = (1, 42)
     basedir = temp_builds_dir.join('interface_dummy_page_job')
 
-    engine = DummyScreenshot(basedir, size_dir=size_dir)
+    engine = DummyInterface(basedir, size_dir=size_dir)
     engine.DESTINATION_FILEPATH = "{name}_test.png"
 
     built, error_logs = engine.page_job(required_size, page)
@@ -130,7 +130,7 @@ def test_perform_size_pages(temp_builds_dir, insert_basedir, pages, size_dir, ex
     required_size = (1, 42)
     basedir = temp_builds_dir.join('interface_dummy_perform_size_pages')
 
-    engine = DummyScreenshot(basedir, size_dir=size_dir)
+    engine = DummyInterface(basedir, size_dir=size_dir)
     engine.DESTINATION_FILEPATH = "{name}_test.png"
 
     built, error_logs = engine.perform_size_pages(required_size, pages)
@@ -188,7 +188,7 @@ def test_run(temp_builds_dir, insert_basedir, pages, size_dir, expected_dirs,
     """
     basedir = temp_builds_dir.join('interface_dummy_run')
 
-    engine = DummyScreenshot(basedir, size_dir=size_dir)
+    engine = DummyInterface(basedir, size_dir=size_dir)
     engine.DESTINATION_FILEPATH = "{name}_test.png"
 
     built, error_logs = engine.run(pages)

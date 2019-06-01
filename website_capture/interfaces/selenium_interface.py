@@ -5,23 +5,23 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from website_capture.interfaces.base import BaseScreenshot, LogManagerMixin
+from website_capture.interfaces.base import BaseInterface, LogManagerMixin
 
 
-class SeleniumFirefoxScreenshot(LogManagerMixin, BaseScreenshot):
+class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
     """
     Using Firefox browser directly from WebDriver through Selenium.
 
     Here the interface is a browser driver.
     """
     DESTINATION_FILEPATH = "{name}_firefox_selenium.png"
-    INTERFACE_CLASS = webdriver.Firefox
+    DRIVER_CLASS = webdriver.Firefox
     FLUSH_DRIVER_LOGS = True # TODO: Should be override by page config option
 
-    def set_interface_size(self, interface, config):
-        interface.set_window_size(*config["size"])
+    def set_browser_size(self, driver, config):
+        driver.set_window_size(*config["size"])
 
-    def get_interface_options(self, config):
+    def get_driver_options(self, config):
         options = FirefoxOptions()
 
         if self.headless:
@@ -40,30 +40,30 @@ class SeleniumFirefoxScreenshot(LogManagerMixin, BaseScreenshot):
 
         return {
             "options": options,
-            "log_path": config["interface_log_path"],
+            "log_path": config["driver_log_path"],
             "desired_capabilities": dc,
             "firefox_profile": fp,
         }
 
-    def get_interface_instance(self, options, config):
+    def get_driver_instance(self, options, config):
         """
         Remove previous log filename if exists (so it does stack with logs
-        from previous runs) then initialize interface.
+        from previous runs) then initialize driver.
         """
-        if os.path.exists(config["interface_log_path"]):
-            os.remove(config["interface_log_path"])
+        if os.path.exists(config["driver_log_path"]):
+            os.remove(config["driver_log_path"])
 
-        klass = self.get_interface_class()
-        interface = klass(**options)
+        klass = self.get_driver_class()
+        driver = klass(**options)
 
-        return interface
+        return driver
 
-    def load_page(self, interface, config):
-        super().load_page(interface, config)
+    def load_page(self, driver, config):
+        super().load_page(driver, config)
 
-        return interface.get(config["url"])
+        return driver.get(config["url"])
 
-    def parse_logs(self, interface, config, content):
+    def parse_logs(self, driver, config, content):
         """
         Parse browser logs from given content.
 
@@ -73,7 +73,7 @@ class SeleniumFirefoxScreenshot(LogManagerMixin, BaseScreenshot):
 
         Currently the state of browser logging is very difficult with Firefox,
         at least we are able to get Javascript issues (in a messy way) but
-        getting "console.log" output is cryptic, see "get_interface_options"
+        getting "console.log" output is cryptic, see "get_driver_options"
         for much details.
         """
         logs = []
@@ -86,44 +86,44 @@ class SeleniumFirefoxScreenshot(LogManagerMixin, BaseScreenshot):
 
         return logs
 
-    def task_logs(self, interface, config, response):
-        payload = super().task_logs(interface, config, response)
-        self.store_browser_logs(interface, config, payload)
+    def task_logs(self, driver, config, response):
+        payload = super().task_logs(driver, config, response)
+        self.store_browser_logs(driver, config, payload)
 
         return payload
 
-    def task_screenshot(self, interface, config, response):
+    def task_screenshot(self, driver, config, response):
         """
         A trick with this driver is to select the body element to get it full,
         since default driver screenshot behavior will cut content to the
         window viewport (that should be the asked size from page config).
         """
-        el = interface.find_element_by_tag_name("body")
+        el = driver.find_element_by_tag_name("body")
         el.screenshot(config["destination"])
 
         return config["destination"]
 
-    def tear_down_interface(self, interface, config):
-        super().tear_down_interface(interface, config)
+    def tear_down_driver(self, driver, config):
+        super().tear_down_driver(driver, config)
 
         if self.FLUSH_DRIVER_LOGS:
-            self.remove_driver_logs(interface, config)
+            self.remove_driver_logs(driver, config)
 
-        interface.quit()
+        driver.quit()
 
 
-class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
+class SeleniumChromeInterface(SeleniumFirefoxInterface):
     """
     Using Chrome browser directly from WebDriver through Selenium.
 
-    It is based on SeleniumFirefoxScreenshot since they share the Selenium
+    It is based on SeleniumFirefoxInterface since they share the Selenium
     base API.
     """
     DESTINATION_FILEPATH = "{name}_chrome_selenium.png"
-    INTERFACE_CLASS = webdriver.Chrome
+    DRIVER_CLASS = webdriver.Chrome
     FLUSH_DRIVER_LOGS = True # TODO: Should be override by page config option
 
-    def get_interface_options(self, config):
+    def get_driver_options(self, config):
         options = ChromeOptions()
         if self.headless:
             options.headless = True
@@ -135,23 +135,23 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
 
         return {
             "options": options,
-            "service_log_path": config["interface_log_path"],
+            "service_log_path": config["driver_log_path"],
             "desired_capabilities": dc,
         }
 
-    def load_page(self, interface, config):
-        super().load_page(interface, config)
+    def load_page(self, driver, config):
+        super().load_page(driver, config)
 
-        return interface.get(config["url"])
+        return driver.get(config["url"])
 
-    def get_driver_logs_content(self, interface, config, response):
+    def get_driver_logs_content(self, driver, config, response):
         """
         Chrome driver does not push logs to a file, but dispose them from its
         API
         """
-        return interface.get_log("browser")
+        return driver.get_log("browser")
 
-    def parse_logs(self, interface, config, content):
+    def parse_logs(self, driver, config, content):
         """
         Parse browser logs from given content.
 
@@ -175,15 +175,15 @@ class SeleniumChromeScreenshot(SeleniumFirefoxScreenshot):
 
         return logs
 
-    def task_screenshot(self, interface, config, response):
-        interface.get_screenshot_as_file(config["destination"])
+    def task_screenshot(self, driver, config, response):
+        driver.get_screenshot_as_file(config["destination"])
 
         return config["destination"]
 
-    def tear_down_interface(self, interface, config):
-        super().tear_down_interface(interface, config)
+    def tear_down_driver(self, driver, config):
+        super().tear_down_driver(driver, config)
 
         if self.FLUSH_DRIVER_LOGS:
-            self.remove_driver_logs(interface, config)
+            self.remove_driver_logs(driver, config)
 
-        interface.quit()
+        driver.quit()

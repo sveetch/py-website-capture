@@ -21,7 +21,7 @@ from website_capture.interfaces.base import LogManagerMixin
 def test_parse_logs(page, content, expected):
     """
     Basic 'parse_logs' method does not perform any real parsing (yet have to be
-    implemented from browser interface) and return an empty list.
+    implemented from final interface) and return an empty list.
     """
     manager = LogManagerMixin()
 
@@ -34,7 +34,7 @@ def test_parse_logs(page, content, expected):
             "name": "foo",
             "url": "some_url",
             "size": (1, 42),
-            "interface_log_path": "some_path.driver.log",
+            "driver_log_path": "some_path.driver.log",
             "browser_log_path": "some_path.browser.json",
         },
         "Some content",
@@ -48,9 +48,9 @@ def test_task_logs(temp_builds_dir, insert_basedir, page, content, expected):
     basedir = temp_builds_dir.join('logmanager_task_logs')
     os.makedirs(basedir)
 
-    page = insert_basedir(basedir, page, fields=["interface_log_path"])
+    page = insert_basedir(basedir, page, fields=["driver_log_path"])
 
-    with io.open(page["interface_log_path"], "w") as fp:
+    with io.open(page["driver_log_path"], "w") as fp:
         fp.write(content)
 
     manager = LogManagerMixin()
