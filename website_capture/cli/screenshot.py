@@ -9,11 +9,6 @@ from website_capture.interfaces.selenium_interface import (
     SeleniumChromeInterface
 )
 
-#from website_capture.interfaces.splinter_interface import (
-    #SplinterFirefoxScreenshot,
-    #SplinterChromeScreenshot
-#)
-
 from website_capture.conf import get_project_configuration
 
 
@@ -67,14 +62,3 @@ def screenshot_command(context, interface, browser, config):
             logger.info("🤖 SeleniumChromeInterface")
             interface_instance = SeleniumChromeInterface(**interface_config)
             interface_instance.run(pages=json_config["pages"])
-
-    #if interface == "splinter":
-        #if "firefox" in browser:
-            #logger.info("🤖 SplinterFirefoxScreenshot")
-            #interface_instance = SplinterFirefoxScreenshot(**interface_config)
-            #interface_instance.run(pages=json_config["pages"])
-
-        #if "chrome" in browser:
-            #logger.info("🤖 SplinterChromeScreenshot")
-            #interface_instance = SplinterChromeScreenshot(**interface_config)
-            #interface_instance.run(pages=json_config["pages"])

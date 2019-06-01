@@ -5,15 +5,10 @@ Actually a Proof of Concept for a tool able to take screenshot of many website
 pages.
 
 It implements some high level interface to take screenshot of full page.
-Currently there is implementation with Selenium and another one with Splinter
-(which act on top of Selenium) to test the two solutions.
+Currently there is an implementation with Selenium.
 
 Also there are some page on both solutions fails, like page which involve
 some specific absolute position flows or have Javascript errors.
-
-For now Splinter implementation seems to crop screenshots and Selenium
-Webdriver allways have the better results. NOTE: Once you set a window size,
-Splinter seems to be ok in fullscreen mode.
 
 Also chromedriver at least in version 73 is bugged because screenshot is
 largely cropped even if you enforce a window size, resulting image will have
@@ -27,7 +22,7 @@ for screenshot tasks with responsive versions.
 
 Also it should be a high level layer to implement custom code to perform tests
 tasks on frontend (like event interaction, DOM inspection, etc..) since
-Selenium and Splinter are ready for that.
+Selenium is ready for that.
 
 Requires
 ********
@@ -161,7 +156,7 @@ To launch screenshot tasks: ::
 
 ``--interface`` argument is not required but by default it use the dummy
 interface which does not nothing, this is just for development debugging.
-Available choices are ``dummy``, ``selenium`` and ``splinter``.
+Available choices are ``dummy`` and ``selenium``.
 
 ``--config`` argument is required and must be a path to an existing and valid
 JSON configuration file.
