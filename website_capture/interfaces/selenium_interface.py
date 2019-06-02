@@ -16,7 +16,7 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
     """
     DESTINATION_FILEPATH = "{name}_firefox_selenium.png"
     DRIVER_CLASS = webdriver.Firefox
-    FLUSH_DRIVER_LOGS = True # TODO: Should be override by page config option
+    FLUSH_DRIVER_LOGS = True # TODO: Should be overrided by page config option
 
     def set_browser_size(self, driver, config):
         driver.set_window_size(*config["size"])
@@ -40,7 +40,10 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
 
         return {
             "options": options,
-            "log_path": config["driver_log_path"],
+            # NOTE: Seems deprecated
+            #"log_path": config["driver_log_path"],
+            # NOTE: In profit of this one
+            "service_log_path": config["driver_log_path"],
             "desired_capabilities": dc,
             "firefox_profile": fp,
         }
@@ -88,9 +91,9 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
 
     def task_logs(self, driver, config, response):
         payload = super().task_logs(driver, config, response)
-        self.store_browser_logs(driver, config, payload)
+        path = self.store_browser_logs(driver, config, payload)
 
-        return payload
+        return path
 
     def task_screenshot(self, driver, config, response):
         """
@@ -121,7 +124,7 @@ class SeleniumChromeInterface(SeleniumFirefoxInterface):
     """
     DESTINATION_FILEPATH = "{name}_chrome_selenium.png"
     DRIVER_CLASS = webdriver.Chrome
-    FLUSH_DRIVER_LOGS = True # TODO: Should be override by page config option
+    FLUSH_DRIVER_LOGS = True # TODO: Should be overrided by page config option
 
     def get_driver_options(self, config):
         options = ChromeOptions()

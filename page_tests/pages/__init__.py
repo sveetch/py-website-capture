@@ -5,7 +5,7 @@ The project pages map for Page tests
 from optimus.pages.views.base import PageViewBase
 from optimus.conf.registry import settings
 
-from .index import Index, JsonIndex
+from .index import Index, JsonIndex, JsonDemoMarker
 from .page import BasicPage
 
 
@@ -37,4 +37,5 @@ SAMPLE_PAGES = [
 PAGES = SAMPLE_PAGES + [
     Index(pages=SAMPLE_PAGES),
     JsonIndex(pages=SAMPLE_PAGES),
+    JsonDemoMarker(),
 ]

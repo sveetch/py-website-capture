@@ -46,7 +46,7 @@ def screenshot_command(context, interface, browser, config):
     if interface == "dummy":
         logger.info("🤖 DummyInterface")
         interface_instance = DummyInterface(**interface_config)
-        interface_instance.run(pages=json_config["pages"])
+        interface_instance.run(json_config["pages"])
     else:
         if len(browser) == 0:
             logger.warning("Interface engine require to choose at least a browser.")
@@ -56,9 +56,9 @@ def screenshot_command(context, interface, browser, config):
         if "firefox" in browser:
             logger.info("🤖 SeleniumFirefoxInterface")
             interface_instance = SeleniumFirefoxInterface(**interface_config)
-            interface_instance.run(pages=json_config["pages"])
+            interface_instance.run(json_config["pages"])
 
         if "chrome" in browser:
             logger.info("🤖 SeleniumChromeInterface")
             interface_instance = SeleniumChromeInterface(**interface_config)
-            interface_instance.run(pages=json_config["pages"])
+            interface_instance.run(json_config["pages"])

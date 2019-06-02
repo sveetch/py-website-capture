@@ -292,6 +292,18 @@ class BaseInterface(object):
 
         return built, error_logs
 
+    def page_default_values(self, pages):
+        """
+        Patch page items with required default values for optional field
+        """
+        for page in pages:
+            # If no sizes option or empty list, fill it with default size to
+            # ensure they are processed
+            if "sizes" not in page or ("sizes" in page and not page["sizes"]):
+                page["sizes"] = [self._default_size_value]
+
+        return pages
+
     def run(self, pages):
         """
         Proceed capture for every item
@@ -299,6 +311,7 @@ class BaseInterface(object):
         built = []
         error_logs = []
 
+        pages = self.page_default_values(pages)
         available_sizes = self.get_available_sizes(pages)
 
         self.log.debug(f"Available sizes: {available_sizes}")
@@ -315,11 +328,6 @@ class BaseInterface(object):
 class LogManagerMixin:
     """
     A mixin for interface to get browser logs from driver logs.
-
-    TODO:
-        * test coverage;
-        * a convenient method to store logs to a file, which could be called
-          at the end of jobs;
     """
     def get_driver_logs_content(self, driver, config, response):
         """
@@ -334,8 +342,7 @@ class LogManagerMixin:
         """
         Will remove driver log file.
 
-        NOTE:
-            Should be called only after driver has been closed.
+        You should call it only after driver has been closed.
         """
         if os.path.exists(config["driver_log_path"]):
             os.remove(config["driver_log_path"])

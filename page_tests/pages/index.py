@@ -74,3 +74,16 @@ class JsonIndex(Index):
 
         return json.dumps(content, indent=4)
 
+
+class JsonDemoMarker(Index):
+    """
+    A dummy JSON file used from tests to ensure server is the expected demo
+    server.
+    """
+    title = "py-website-capture marker"
+    template_name = "marker.json" # Unused
+    destination = "marker.json"
+
+    def render(self, env):
+        return json.dumps({"generator": self.title})
+

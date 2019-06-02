@@ -1,18 +1,12 @@
 Website capture
 ===============
 
-Actually a Proof of Concept for a tool able to take screenshot of many website
+Actually a Proof of Concept for a tool able to take captures of website
 pages.
 
-It implements some high level interface to take screenshot of full page.
-Currently there is an implementation with Selenium.
-
-Also there are some page on both solutions fails, like page which involve
-some specific absolute position flows or have Javascript errors.
-
-Also chromedriver at least in version 73 is bugged because screenshot is
-largely cropped even if you enforce a window size, resulting image will have
-something like 1/3 size less.
+It implements a high level interface to capture content (like screenshot,
+logs, etc..) from a page. Currently there is only an implementation with
+the famous Selenium webdrivers.
 
 Goals
 *****
@@ -97,7 +91,7 @@ You need to have Chrome (or Chromium) browser installed.
 
 Here is sample commands to quickly download and deploy driver on your system: ::
 
-    wget https://chromedriver.storage.googleapis.com/73.0.3683.68/chromedriver_linux64.zip
+    wget https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip
     unzip chromedriver_linux64.zip
     chmod +x chromedriver
     sudo mv chromedriver /usr/local/bin
@@ -111,9 +105,9 @@ Links:
 Going full headless
 -------------------
 
-Even interfaces have a ``headless`` mode, it only apply that browser are not
-displayed when a Webdriver is performing request. You still need a common
-desktop environment to run a browser which is not desirable on a server.
+Even if drivers have a ``headless`` mode, it only imply that browser are not
+displayed when a Webdriver is performing request. You will still need to have
+a desktop environment to run a browser which is not desirable on a server.
 
 To be able to use this project on a server you may look at ``Xvfb`` tool.
 
@@ -231,10 +225,22 @@ filename
     interface name. Filename can be formatted with some pattern according to
     page configuration. Like ``{name}``, ``{size}``, ``{url}``.
 
-Todo
-****
+Issues
+******
 
-* Watch to get console logs from browser so we can log errors if any;
-* Ensure accurate capture behavior with almost every websites;
-* Test coverage for base stuff, we won't test real screenshoters which
-  involves a real browser;
+chromedriver (at least in version 73) is bugged with screenshots which are
+largely cropped even if you enforce a window size and so resulting image may
+not be what you did expect from your content and layout.
+
+Development
+***********
+
+Project is developped with tests, for convenience they are splitted in two separate
+directories.
+
+One to cover core interface which can be runned once project is installed
+and one another dedicated to cover webdriver interfaces.
+
+The last one will require you installed every implemented drivers (and their related
+browser) and running the demo server which you can find in ``page_tests`` directory,
+it have its own Makefile to install its requirements.

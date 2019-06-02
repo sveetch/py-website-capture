@@ -16,8 +16,10 @@ help:
 	@echo "  clean-build         -- to clean screenshot outputs"
 	@echo ""
 	@echo "  flake               -- to launch Flake8 checking"
-	@echo "  tests               -- to launch tests using Pytest"
-	@echo "  quality             -- to launch Flake8 checking and Pytest"
+	@echo "  tests               -- to launch base test suite using Pytest"
+	@echo "  tests-drivers       -- to launch drivers test suite using Pytest"
+	@echo "  tests-all       -- to launch every tests suites using Pytest"
+	@echo "  quality             -- to launch Flake8 checking and every tests suites"
 	@echo
 
 clean-pycache:
@@ -60,5 +62,12 @@ tests:
 	$(PYTEST) -vv --exitfirst tests/
 .PHONY: tests
 
-quality: tests flake
+tests-drivers:
+	$(PYTEST) -vv --exitfirst drivers_tests/
+.PHONY: tests-drivers
+
+tests-all: tests tests-drivers
+.PHONY: tests-all
+
+quality: tests-all flake
 .PHONY: quality
