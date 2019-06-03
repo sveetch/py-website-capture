@@ -215,7 +215,7 @@ def test_get_page_config_invalid(page):
         {
             "destination": "/basedir/1x42/foo_test.png",
             "driver_log_path": "/basedir/1x42/foo_test.png.driver.log",
-            "browser_log_path": "/basedir/1x42/foo_test.png.browser.json",
+            "browser_log_path": "/basedir/1x42/foo_test.png.report.json",
             "name": "foo",
             "size": (1, 42),
             "url": "some_url",
@@ -237,7 +237,7 @@ def test_get_page_config_invalid(page):
             "destination": "/basedir/1x42/bar.png",
             "filename": "bar.png",
             "driver_log_path": "/basedir/1x42/bar.png.driver.log",
-            "browser_log_path": "/basedir/1x42/bar.png.browser.json",
+            "browser_log_path": "/basedir/1x42/bar.png.report.json",
             "name": "foo",
             "ping": "pong",
             "size": (1, 42),

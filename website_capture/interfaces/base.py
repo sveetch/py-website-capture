@@ -125,7 +125,7 @@ class BaseInterface(object):
 
         config["destination"] = self.get_file_destination(config)
         config["driver_log_path"] = ".".join([config["destination"], "driver", "log"])
-        config["browser_log_path"] = ".".join([config["destination"], "browser", "json"])
+        config["browser_log_path"] = ".".join([config["destination"], "report", "json"])
 
         return config
 

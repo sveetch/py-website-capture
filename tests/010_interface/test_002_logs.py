@@ -35,7 +35,7 @@ def test_parse_logs(page, content, expected):
             "url": "some_url",
             "size": (1, 42),
             "driver_log_path": "some_path.driver.log",
-            "browser_log_path": "some_path.browser.json",
+            "browser_log_path": "some_path.report.json",
         },
         "Some content",
         {"logs": [], "name": "foo", "size": (1, 42), "url": "some_url"}
