@@ -331,7 +331,7 @@ def test_load_page(page, size, size_dir, expected):
         {
             "name": "foo",
             "url": "some_url",
-            "tasks": ["screenshot", "logs"],
+            "tasks": ["screenshot", "report"],
         },
         (1, 42),
         True,
@@ -340,7 +340,7 @@ def test_load_page(page, size, size_dir, expected):
             "url": "some_url",
             "size": (1, 42),
             "screenshot": "/basedir/1x42/foo_test.png",
-            "logs": {},
+            "report": {},
         },
     ),
 ])

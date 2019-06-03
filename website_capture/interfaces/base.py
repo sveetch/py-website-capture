@@ -29,7 +29,7 @@ class BaseInterface(object):
     _default_size_value = (0, 0) # Do not change this
     AVAILABLE_PAGE_TASKS = {
         "screenshot": "task_screenshot",
-        "logs": "task_logs",
+        "report": "task_report",
     }
 
     def __init__(self, basedir="", headless=True, size_dir=True):
@@ -180,9 +180,9 @@ class BaseInterface(object):
         """
         return config["destination"]
 
-    def task_logs(self, driver, config, response):
+    def task_report(self, driver, config, response):
         """
-        Should get browser logs from loaded page
+        Should get browser report from loaded page
         """
         return {}
 
@@ -265,8 +265,8 @@ class BaseInterface(object):
                     self.log.debug("  - Saved screenshot to : {}".format(
                         config["destination"]
                     ))
-                if "logs" in payload:
-                    self.log.debug("  - Saved browser log to : {}".format(
+                if "report" in payload:
+                    self.log.debug("  - Saved report to : {}".format(
                         config["browser_log_path"]
                     ))
 
@@ -362,7 +362,7 @@ class LogManagerMixin:
         """
         return []
 
-    def task_logs(self, driver, config, response):
+    def task_report(self, driver, config, response):
         """
         Store browser logs from driver logs.
 

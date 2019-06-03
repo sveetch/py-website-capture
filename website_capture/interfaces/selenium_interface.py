@@ -50,7 +50,7 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
 
     def get_driver_instance(self, options, config):
         """
-        Remove previous log filename if exists (so it does stack with logs
+        Remove previous log file if exists (so it does not stack with logs
         from previous runs) then initialize driver.
         """
         if os.path.exists(config["driver_log_path"]):
@@ -89,8 +89,8 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
 
         return logs
 
-    def task_logs(self, driver, config, response):
-        payload = super().task_logs(driver, config, response)
+    def task_report(self, driver, config, response):
+        payload = super().task_report(driver, config, response)
         path = self.store_browser_logs(driver, config, payload)
 
         return path

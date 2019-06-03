@@ -55,4 +55,4 @@ def test_task_logs(temp_builds_dir, insert_basedir, page, content, expected):
 
     manager = LogManagerMixin()
 
-    assert manager.task_logs({}, page, content) == expected
+    assert manager.task_report({}, page, content) == expected

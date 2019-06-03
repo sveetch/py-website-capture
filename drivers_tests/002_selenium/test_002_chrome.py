@@ -66,13 +66,13 @@ def test_single_report(caplog, debuglogger, temp_builds_dir, demo_baseurl):
         "name": "every-logs",
         "url": "{}/every-logs.basic.html".format(demo_baseurl),
         "sizes": [(1440, 768)],
-        "tasks": ["logs"],
+        "tasks": ["report"],
     }])
 
     assert len(built) == 1
-    assert "logs" in built[0]
+    assert "report" in built[0]
 
-    expected = built[0]["logs"]
+    expected = built[0]["report"]
     assert os.path.exists(expected) == True
     assert os.stat(expected).st_size > 0
 
