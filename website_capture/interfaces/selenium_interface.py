@@ -1,4 +1,5 @@
 import os
+import time
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -62,9 +63,13 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
         return driver
 
     def load_page(self, driver, config):
-        super().load_page(driver, config)
+        response = super().load_page(driver, config)
 
-        return driver.get(config["url"])
+        start_time = time.perf_counter()
+        driver.get(config["url"])
+        response["elapsed_time"] = time.perf_counter() - start_time
+
+        return response
 
     def parse_logs(self, driver, config, content):
         """
@@ -141,11 +146,6 @@ class SeleniumChromeInterface(SeleniumFirefoxInterface):
             "service_log_path": config["driver_log_path"],
             "desired_capabilities": dc,
         }
-
-    def load_page(self, driver, config):
-        super().load_page(driver, config)
-
-        return driver.get(config["url"])
 
     def get_driver_logs_content(self, driver, config, response):
         """

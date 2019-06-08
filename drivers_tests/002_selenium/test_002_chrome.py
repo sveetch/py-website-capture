@@ -81,7 +81,5 @@ def test_single_report(caplog, debuglogger, temp_builds_dir, demo_baseurl):
 
     assert report["logs"] == [
         ["info", "35:16 \"Before error\""],
-        ["error", "36:18 Uncaught ReferenceError: bar is not defined"],
-        ["info", "35:16 \"Before error\""],
         ["error", "36:18 Uncaught ReferenceError: bar is not defined"]
     ]

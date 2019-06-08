@@ -287,7 +287,7 @@ def test_get_driver_instance():
         },
         (1, 42),
         True,
-        "Pretending to load page: some_url",
+        {"elapsed_time": 0},
     ),
 ])
 def test_load_page(page, size, size_dir, expected):

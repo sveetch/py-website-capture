@@ -167,13 +167,19 @@ class BaseInterface(object):
     def load_page(self, driver, config):
         """
         Load given page url into given driver
+
+        Returns:
+            dict: A dictionnary with informations about page loading. Interface
+            should always return an accurate elapsed time.
         """
         self.log.info("🔹 Getting page for: {} ({})".format(
             config["name"],
             self.get_size_repr(*config["size"]),
         ))
 
-        return "Pretending to load page: {}".format(config["url"])
+        return {
+            "elapsed_time": 0,
+        }
 
     def task_screenshot(self, driver, config, response):
         """
@@ -377,6 +383,7 @@ class LogManagerMixin:
             "url": config["url"],
             "size": config["size"],
             "interface": self.__class__.__name__,
+            "elapsed_time": response["elapsed_time"],
         }
 
         content = self.get_driver_logs_content(driver, config, response)

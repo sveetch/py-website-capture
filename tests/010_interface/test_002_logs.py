@@ -43,7 +43,8 @@ def test_parse_logs(page, content, expected):
             "name": "foo",
             "size": (1, 42),
             "url": "some_url",
-            "interface": "LogManagerMixin"
+            "interface": "LogManagerMixin",
+            "elapsed_time": 42,
         }
     ),
 ])
@@ -61,4 +62,4 @@ def test_task_logs(temp_builds_dir, insert_basedir, page, content, expected):
 
     manager = LogManagerMixin()
 
-    assert manager.task_report({}, page, content) == expected
+    assert manager.task_report({}, page, {"elapsed_time": 42}) == expected

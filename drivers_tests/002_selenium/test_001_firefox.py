@@ -135,6 +135,7 @@ def test_single_report(caplog, debuglogger, temp_builds_dir, demo_baseurl):
         report = json.loads(fp.read())
 
     assert report["interface"] == "SeleniumFirefoxInterface"
+    assert report["elapsed_time"] > 0
 
     assert report["logs"] == [
         [
