@@ -38,7 +38,13 @@ def test_parse_logs(page, content, expected):
             "browser_log_path": "some_path.report.json",
         },
         "Some content",
-        {"logs": [], "name": "foo", "size": (1, 42), "url": "some_url"}
+        {
+            "logs": [],
+            "name": "foo",
+            "size": (1, 42),
+            "url": "some_url",
+            "interface": "LogManagerMixin"
+        }
     ),
 ])
 def test_task_logs(temp_builds_dir, insert_basedir, page, content, expected):

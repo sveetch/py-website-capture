@@ -327,7 +327,7 @@ def test_load_page(page, size, size_dir, expected):
             "screenshot": "/basedir/1x42/foo_test.png",
         },
     ),
-    # Screenshot and log capture tasks
+    # Screenshot and report tasks
     (
         {
             "name": "foo",

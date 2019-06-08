@@ -376,6 +376,7 @@ class LogManagerMixin:
             "name": config["name"],
             "url": config["url"],
             "size": config["size"],
+            "interface": self.__class__.__name__,
         }
 
         content = self.get_driver_logs_content(driver, config, response)

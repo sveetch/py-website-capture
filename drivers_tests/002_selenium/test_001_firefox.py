@@ -130,8 +130,11 @@ def test_single_report(caplog, debuglogger, temp_builds_dir, demo_baseurl):
     assert os.path.exists(expected) == True
     assert os.stat(expected).st_size > 0
 
+    # Open create report to check it
     with io.open(expected, "r") as fp:
         report = json.loads(fp.read())
+
+    assert report["interface"] == "SeleniumFirefoxInterface"
 
     assert report["logs"] == [
         [
