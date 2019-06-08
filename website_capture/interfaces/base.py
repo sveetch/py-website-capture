@@ -11,13 +11,13 @@ from website_capture.exceptions import InvalidPageSizeError, PageConfigError
 
 class BaseInterface(object):
     """
-    Base screenshoter interface does not implement any driver, it's just a
+    Base interface does not implement any driver, it's just a
     task runner for given page items.
 
     Keyword Arguments:
         headless (bool): Determine if browser is used through headless mode or
             not. Default is True
-        basedir (string): Base directory where is save screenshot files.
+        basedir (string): Base directory where task files will be created.
         size_dir (string): Enable or not behavior to create a subdirectory for
             each different size used from page configurations. Default is True.
             Remember to add a size into template

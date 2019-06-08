@@ -4,8 +4,7 @@ Website capture
 A tool able to capture content from web pages.
 
 It implements a high level interface to capture content (like screenshot,
-logs, etc..) from a page. Currently there is only an implementation with
-the famous Selenium webdrivers.
+logs, etc..) from a page the famous Selenium library.
 
 Requires
 ********
@@ -13,6 +12,7 @@ Requires
 * Python>=3.4;
 * Virtualenv;
 * Pip;
+* `Selenium <https://pypi.org/project/selenium/>`_;
 * A browser and its `WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_;
 
 Install
@@ -133,13 +133,13 @@ To read full help about a command, here the ``version`` command: ::
 
     website-capture version -h
 
-To launch screenshot tasks: ::
+To launch captures from a job configuration file ``sample.json``: ::
 
-    website-capture screen --interface selenium --config sample.json
+    website-capture capture --interface firefox --config sample.json
 
 ``--interface`` argument is not required but by default it use the dummy
 interface which does not nothing, this is just for development debugging.
-Available choices are ``dummy`` and ``selenium``.
+See ``capture`` command help to see available interfaces.
 
 ``--config`` argument is required and must be a path to an existing and valid
 JSON configuration file.
@@ -222,12 +222,15 @@ tasks
     * ``screenshot``: will create an image file of page screenshot;
     * ``report`` will create a JSON file to report captured logs from page;
 
-Issues
-******
+    Although it's an optional argument, this is not really useful to define a
+    page job without it since it won't do nothing except to initialize driver.
 
-chromedriver (at least in version 73) is bugged with screenshots which are
-largely cropped even if you enforce a window size and so resulting image may
-not be what you did expect from your content and layout.
+Known issues
+************
+
+* Screenshots are not consistant through browsers and what you should except
+  (compared to what you see when looking a page from a browser);
+* Firefox report task is not able to get console logs, only Javascript errors;
 
 Development
 ***********

@@ -21,7 +21,7 @@ def get_project_configuration(fileobject):
     """
     logger = logging.getLogger("py-website-capture")
 
-    msg = "Trying to open JSON configuration file: {}"
+    msg = "Opening JSON configuration file: {}"
     filename = getattr(fileobject, "name", fileobject.__repr__())
     logger.debug(msg.format(filename))
 

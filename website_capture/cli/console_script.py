@@ -6,7 +6,7 @@ import click
 from website_capture.logs import init_logger
 
 from website_capture.cli.version import version_command
-from website_capture.cli.screenshot import screenshot_command
+from website_capture.cli.capture import capture_command
 
 
 # Help alias on '-h' argument
@@ -48,4 +48,4 @@ def cli_frontend(ctx, verbose):
 
 # Attach commands methods to the main grouper
 cli_frontend.add_command(version_command, name="version")
-cli_frontend.add_command(screenshot_command, name="screen")
+cli_frontend.add_command(capture_command, name="capture")
