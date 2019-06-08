@@ -1,5 +1,5 @@
 """
-A tool to make website page captures
+A tool able to capture content from web pages
 """
 from __future__ import absolute_import, unicode_literals
 

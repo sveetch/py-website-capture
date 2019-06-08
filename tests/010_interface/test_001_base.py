@@ -213,9 +213,10 @@ def test_get_page_config_invalid(page):
         (1, 42),
         True,
         {
-            "destination": "/basedir/1x42/foo_test.png",
-            "driver_log_path": "/basedir/1x42/foo_test.png.driver.log",
-            "browser_log_path": "/basedir/1x42/foo_test.png.report.json",
+            "destination": "/basedir/1x42/foo_test",
+            "screenshot_path": "/basedir/1x42/foo_test.png",
+            "driver_log_path": "/basedir/1x42/foo_test.driver.log",
+            "browser_log_path": "/basedir/1x42/foo_test.report.json",
             "name": "foo",
             "size": (1, 42),
             "url": "some_url",
@@ -226,7 +227,7 @@ def test_get_page_config_invalid(page):
     # final page config
     (
         {
-            "filename": "bar.png",
+            "filename": "bar",
             "name": "foo",
             "ping": "pong",
             "url": "some_url",
@@ -234,10 +235,11 @@ def test_get_page_config_invalid(page):
         (1, 42),
         True,
         {
-            "destination": "/basedir/1x42/bar.png",
-            "filename": "bar.png",
-            "driver_log_path": "/basedir/1x42/bar.png.driver.log",
-            "browser_log_path": "/basedir/1x42/bar.png.report.json",
+            "destination": "/basedir/1x42/bar",
+            "filename": "bar",
+            "screenshot_path": "/basedir/1x42/bar.png",
+            "driver_log_path": "/basedir/1x42/bar.driver.log",
+            "browser_log_path": "/basedir/1x42/bar.report.json",
             "name": "foo",
             "ping": "pong",
             "size": (1, 42),
@@ -247,7 +249,7 @@ def test_get_page_config_invalid(page):
 ])
 def test_get_page_config(page, size, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
-    interface.DESTINATION_FILEPATH = "{name}_test.png"
+    interface.DESTINATION_FILEPATH = "{name}_test"
     assert interface.get_page_config(page, size) == expected
 
 
@@ -290,7 +292,6 @@ def test_get_driver_instance():
 ])
 def test_load_page(page, size, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
-    interface.DESTINATION_FILEPATH = "{name}_test.png"
     # For BaseInterface test we don't need a real driver
     driver = object()
 
@@ -346,7 +347,7 @@ def test_load_page(page, size, size_dir, expected):
 ])
 def test_capture(page, size, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
-    interface.DESTINATION_FILEPATH = "{name}_test.png"
+    interface.DESTINATION_FILEPATH = "{name}_test"
     # For BaseInterface test we don't need a real driver
     driver = object()
 

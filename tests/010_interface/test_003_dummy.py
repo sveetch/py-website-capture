@@ -43,7 +43,7 @@ def test_capture(page, size, size_dir, expected):
     'capture' method should perform tasks for given page
     """
     engine = DummyInterface("/basedir", size_dir=size_dir)
-    engine.DESTINATION_FILEPATH = "{name}_test.png"
+    engine.DESTINATION_FILEPATH = "{name}_test"
 
     config = engine.get_page_config(page, size)
     options = engine.get_driver_options(config)
@@ -79,7 +79,7 @@ def test_page_job(temp_builds_dir, insert_basedir, page, size_dir, expected):
     basedir = temp_builds_dir.join('interface_dummy_page_job')
 
     engine = DummyInterface(basedir, size_dir=size_dir)
-    engine.DESTINATION_FILEPATH = "{name}_test.png"
+    engine.DESTINATION_FILEPATH = "{name}_test"
 
     built, error_logs = engine.page_job(required_size, page)
 
@@ -131,7 +131,7 @@ def test_perform_size_pages(temp_builds_dir, insert_basedir, pages, size_dir, ex
     basedir = temp_builds_dir.join('interface_dummy_perform_size_pages')
 
     engine = DummyInterface(basedir, size_dir=size_dir)
-    engine.DESTINATION_FILEPATH = "{name}_test.png"
+    engine.DESTINATION_FILEPATH = "{name}_test"
 
     built, error_logs = engine.perform_size_pages(required_size, pages)
     assert built == [insert_basedir(basedir, item) for item in expected_payload]
@@ -189,7 +189,7 @@ def test_run(temp_builds_dir, insert_basedir, pages, size_dir, expected_dirs,
     basedir = temp_builds_dir.join('interface_dummy_run')
 
     engine = DummyInterface(basedir, size_dir=size_dir)
-    engine.DESTINATION_FILEPATH = "{name}_test.png"
+    engine.DESTINATION_FILEPATH = "{name}_test"
 
     built, error_logs = engine.run(pages)
     assert built == [insert_basedir(basedir, item) for item in expected_payload]

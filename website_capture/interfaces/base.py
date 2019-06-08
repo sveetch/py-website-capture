@@ -24,7 +24,7 @@ class BaseInterface(object):
             ``BaseInterface.DESTINATION_FILEPATH`` if you disable this and you
             have more than one size used in your pages.
     """
-    DESTINATION_FILEPATH = "{name}_base.png"
+    DESTINATION_FILEPATH = "{name}_base"
     DRIVER_CLASS = None
     _default_size_value = (0, 0) # Do not change this
     AVAILABLE_PAGE_TASKS = {
@@ -90,7 +90,7 @@ class BaseInterface(object):
 
     def get_file_destination(self, config):
         """
-        Return screenshot file destination path.
+        Return page job base filepath destination.
 
         Given page item is passed to filename formating. So
         ``BaseInterface.DESTINATION_FILEPATH`` template may contains reference
@@ -124,6 +124,7 @@ class BaseInterface(object):
         config["size"] = size
 
         config["destination"] = self.get_file_destination(config)
+        config["screenshot_path"] = ".".join([config["destination"], "png"])
         config["driver_log_path"] = ".".join([config["destination"], "driver", "log"])
         config["browser_log_path"] = ".".join([config["destination"], "report", "json"])
 
@@ -178,7 +179,7 @@ class BaseInterface(object):
         """
         Should screenshot loaded page.
         """
-        return config["destination"]
+        return config["screenshot_path"]
 
     def task_report(self, driver, config, response):
         """
@@ -263,7 +264,7 @@ class BaseInterface(object):
                 # Should live in dedicated task method
                 if "screenshot" in payload:
                     self.log.debug("  - Saved screenshot to : {}".format(
-                        config["destination"]
+                        config["screenshot_path"]
                     ))
                 if "report" in payload:
                     self.log.debug("  - Saved report to : {}".format(

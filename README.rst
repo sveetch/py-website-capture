@@ -1,22 +1,11 @@
 Website capture
 ===============
 
-Actually a Proof of Concept for a tool able to take captures of website
-pages.
+A tool able to capture content from web pages.
 
 It implements a high level interface to capture content (like screenshot,
 logs, etc..) from a page. Currently there is only an implementation with
 the famous Selenium webdrivers.
-
-Goals
-*****
-
-An end user project with a command line interface using JSON for page registry
-for screenshot tasks with responsive versions.
-
-Also it should be a high level layer to implement custom code to perform tests
-tasks on frontend (like event interaction, DOM inspection, etc..) since
-Selenium is ready for that.
 
 Requires
 ********
@@ -220,10 +209,18 @@ sizes
     is used, this is not recommanded since each driver has its own size which
     is often odd. If needed you can add default size with value ``[0, 0]``.
 filename
-    Optional filename. When undefined, default behavior is to use the filename
+    Optional filename to be used as base filepath for resulting files from
+    task. Then each task will suffix this base filepath with its extension(s).
+
+    When undefined, default behavior is to use the filename
     format from interface class that commonly contains size, page name and
     interface name. Filename can be formatted with some pattern according to
     page configuration. Like ``{name}``, ``{size}``, ``{url}``.
+tasks
+    A list of tasks to perform for this page. Available tasks are:
+
+    * ``screenshot``: will create an image file of page screenshot;
+    * ``report`` will create a JSON file to report captured logs from page;
 
 Issues
 ******

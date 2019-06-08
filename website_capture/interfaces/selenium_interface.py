@@ -14,7 +14,7 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
 
     Here the interface is a browser driver.
     """
-    DESTINATION_FILEPATH = "{name}_firefox_selenium.png"
+    DESTINATION_FILEPATH = "{name}_firefox"
     DRIVER_CLASS = webdriver.Firefox
     FLUSH_DRIVER_LOGS = True # TODO: Should be overrided by page config option
 
@@ -102,9 +102,9 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
         window viewport (that should be the asked size from page config).
         """
         el = driver.find_element_by_tag_name("body")
-        el.screenshot(config["destination"])
+        el.screenshot(config["screenshot_path"])
 
-        return config["destination"]
+        return config["screenshot_path"]
 
     def tear_down_driver(self, driver, config):
         super().tear_down_driver(driver, config)
@@ -122,7 +122,7 @@ class SeleniumChromeInterface(SeleniumFirefoxInterface):
     It is based on SeleniumFirefoxInterface since they share the Selenium
     base API.
     """
-    DESTINATION_FILEPATH = "{name}_chrome_selenium.png"
+    DESTINATION_FILEPATH = "{name}_chrome"
     DRIVER_CLASS = webdriver.Chrome
     FLUSH_DRIVER_LOGS = True # TODO: Should be overrided by page config option
 
@@ -179,9 +179,9 @@ class SeleniumChromeInterface(SeleniumFirefoxInterface):
         return logs
 
     def task_screenshot(self, driver, config, response):
-        driver.get_screenshot_as_file(config["destination"])
+        driver.get_screenshot_as_file(config["screenshot_path"])
 
-        return config["destination"]
+        return config["screenshot_path"]
 
     def tear_down_driver(self, driver, config):
         super().tear_down_driver(driver, config)
