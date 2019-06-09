@@ -41,7 +41,6 @@ class JsonIndex(Index):
     JSON page configuration for py-website-capture
     """
     title = "Index"
-    template_name = "index.json" # Unused
     destination = "index.json"
 
     def render(self, env):
@@ -62,12 +61,13 @@ class JsonIndex(Index):
                 "url": os.path.join(self.env.globals["SITE"]["web_url"],
                                     page.destination),
                 "sizes": sizes,
-                "tasks": ["screenshot", "logs"]
+                "filename": "{name}.{interface}.{size}",
+                "tasks": ["screenshot", "report"]
             })
 
         content = {
             "output_dir": "./outputs/page-tests/",
-            "size_dir": True,
+            "size_dir": False,
             "headless": True,
             "pages": pages_map,
         }
@@ -81,7 +81,6 @@ class JsonDemoMarker(Index):
     server.
     """
     title = "py-website-capture marker"
-    template_name = "marker.json" # Unused
     destination = "marker.json"
 
     def render(self, env):

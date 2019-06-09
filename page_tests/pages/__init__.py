@@ -31,6 +31,11 @@ SAMPLE_PAGES = [
         template_name="lorem-ipsum.basic.html",
         destination="lorem-ipsum.basic.html",
     ),
+    BasicPage(
+        title="Out of viewport",
+        template_name="out-of-viewport.html",
+        destination="out-of-viewport.html",
+    ),
 ]
 
 # Enabled pages to build

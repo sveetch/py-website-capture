@@ -5,12 +5,12 @@
         <div class="v-space-short">
             <h1 class="title-2 text-upper text-center underline short far">{{ page_title }}</h1>
             <div class="v-space-short text-center">
-                <p>This sample has just simple text content without anything special.</p>
+                <p>This sample has content which will be bigger than viewport and so exceed <code>&lt;body&gt;</code> width.</p>
             </div>
             <div class="box bluesapphire9 v-divider-normal">
                 {{ lipsum(n=3, html=True, min=30, max=70) }}
             </div>
-            <div class="box whitesmoke9">
+            <div class="box whitesmoke9" style="width: 130vw;">
                 {{ lipsum(n=3, html=True, min=30, max=70) }}
             </div>
         </div>

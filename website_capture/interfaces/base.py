@@ -103,6 +103,7 @@ class BaseInterface(object):
             self.get_destination_dir(config["size"]),
             filename.format(**{
                 "name": config["name"],
+                "interface": self.__class__.__name__,
                 "size": self.get_size_repr(*config["size"]),
             }),
         )
