@@ -3,6 +3,7 @@ import click
 import logging
 from collections import OrderedDict
 
+from website_capture.exceptions import SettingsInvalidError
 from website_capture.interfaces.dummy import DummyInterface
 
 from website_capture.interfaces.selenium_interface import (
@@ -40,7 +41,12 @@ def capture_command(context, interface, config):
     """
     logger = logging.getLogger("py-website-capture")
 
-    json_config = get_project_configuration(config)
+    try:
+        json_config = get_project_configuration(config)
+    except SettingsInvalidError as e:
+        logger.critical(e)
+        raise click.Abort()
+
 
     interface_config = {
         "basedir": json_config["output_dir"],

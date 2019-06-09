@@ -149,6 +149,7 @@ def test_get_destination_dir(size, size_dir, expected):
 @pytest.mark.parametrize("config,size_dir,expected", [
     (
         {
+            "name": "foo",
             "filename": "foo.png",
             "size": BaseInterface._default_size_value,
         },
@@ -157,6 +158,7 @@ def test_get_destination_dir(size, size_dir, expected):
     ),
     (
         {
+            "name": "foo",
             "filename": "foo.png",
             "size": (1, 42),
         },
@@ -165,6 +167,7 @@ def test_get_destination_dir(size, size_dir, expected):
     ),
     (
         {
+            "name": "foo",
             "filename": "foo.png",
             "size": (1, 42),
         },

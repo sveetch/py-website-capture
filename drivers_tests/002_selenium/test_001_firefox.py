@@ -6,6 +6,10 @@ from shutil import which
 
 import pytest
 
+import click
+from click.testing import CliRunner
+
+from website_capture.cli.console_script import cli_frontend
 from website_capture.logs import init_logger
 from website_capture.interfaces.selenium_interface import SeleniumFirefoxInterface
 
@@ -143,3 +147,60 @@ def test_single_report(caplog, debuglogger, temp_builds_dir, demo_baseurl):
             "line 37: ReferenceError: bar is not defined"
         ]
     ]
+
+
+def test_cli_screenshot(caplog):
+    """
+    Driver screenshot usage on simple demo page with custom base filename and
+    without size directory.
+    """
+    runner = CliRunner()
+
+    config = {
+        "output_dir": ".",
+        "size_dir": False,
+        "pages": [
+            {
+                "name": "basic-lorem-ipsum",
+                "url": "http://localhost:8001/lorem-ipsum.basic.html",
+                "filename": "sample_{size}",
+                "tasks": ["screenshot"],
+            },
+        ]
+    }
+
+    # Temporary isolated current dir
+    with runner.isolated_filesystem():
+        test_cwd = os.getcwd()
+
+        with io.open("foo.json", 'w') as fp:
+            json.dump(config, fp)
+
+        result = runner.invoke(cli_frontend, [
+            "capture",
+            "--config",
+            "foo.json",
+            "--interface",
+            "firefox",
+        ])
+
+        #print("exit_code:", result.exit_code)
+        #print(result.output)
+        #print(caplog.record_tuples)
+
+        assert caplog.record_tuples == [
+            ("py-website-capture", 20,
+             "🤖 SeleniumFirefoxInterface"),
+            ("py-website-capture", 20,
+             "🔹 Getting page for: basic-lorem-ipsum (Default)")
+        ]
+
+        assert sorted(os.listdir(test_cwd)) == sorted([
+            "sample_Default.png",
+            "foo.json",
+        ])
+
+        expected = os.path.join(test_cwd, "sample_Default.png")
+        assert os.stat(expected).st_size > 0
+
+        assert result.exit_code == 0

@@ -241,6 +241,6 @@ directories.
 One to cover core interface which can be runned once project is installed
 and one another dedicated to cover webdriver interfaces.
 
-The last one will require you installed every implemented drivers (and their related
-browser) and running the demo server which you can find in ``page_tests`` directory,
-it have its own Makefile to install its requirements.
+The last one will require you have installed every implemented drivers (and
+their related browser) and running the demo server which you can find in
+``page_tests`` directory, it have its own Makefile to install its requirements.

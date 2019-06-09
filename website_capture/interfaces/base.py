@@ -101,7 +101,10 @@ class BaseInterface(object):
 
         return os.path.join(
             self.get_destination_dir(config["size"]),
-            filename.format(**config),
+            filename.format(**{
+                "name": config["name"],
+                "size": self.get_size_repr(*config["size"]),
+            }),
         )
 
     def get_page_config(self, page, size):
