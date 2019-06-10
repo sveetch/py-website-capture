@@ -151,8 +151,8 @@ def test_single_report(caplog, debuglogger, temp_builds_dir, demo_baseurl):
 
 def test_cli_screenshot(caplog):
     """
-    Driver screenshot usage on simple demo page with custom base filename and
-    without size directory.
+    Driver screenshot usage on simple demo page with custom base filename,
+    without size directory for both screenshot methods.
     """
     runner = CliRunner()
 
@@ -161,9 +161,15 @@ def test_cli_screenshot(caplog):
         "size_dir": False,
         "pages": [
             {
-                "name": "basic-lorem-ipsum",
+                "name": "body-lorem-ipsum",
                 "url": "http://localhost:8001/lorem-ipsum.basic.html",
-                "filename": "sample_{size}",
+                "filename": "body_{size}",
+                "tasks": ["screenshot"],
+            },
+            {
+                "name": "window-lorem-ipsum",
+                "url": "http://localhost:8001/lorem-ipsum.basic.html",
+                "filename": "window_{size}",
                 "tasks": ["screenshot"],
             },
         ]
@@ -192,15 +198,21 @@ def test_cli_screenshot(caplog):
             ("py-website-capture", 20,
              "🤖 SeleniumFirefoxInterface"),
             ("py-website-capture", 20,
-             "🔹 Getting page for: basic-lorem-ipsum (Default)")
+             "🔹 Getting page for: body-lorem-ipsum (Default)"),
+            ("py-website-capture", 20,
+             "🔹 Getting page for: window-lorem-ipsum (Default)"),
         ]
 
         assert sorted(os.listdir(test_cwd)) == sorted([
-            "sample_Default.png",
+            "body_Default.png",
+            "window_Default.png",
             "foo.json",
         ])
 
-        expected = os.path.join(test_cwd, "sample_Default.png")
+        expected = os.path.join(test_cwd, "body_Default.png")
+        assert os.stat(expected).st_size > 0
+
+        expected = os.path.join(test_cwd, "window_Default.png")
         assert os.stat(expected).st_size > 0
 
         assert result.exit_code == 0

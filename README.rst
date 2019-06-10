@@ -29,7 +29,8 @@ install it you will need to do something like: ::
 
     pip install git+https://github.com/sveetch/py-website-capture.git#egg=py_website_capture
 
-However in this way it will only usable as Python module, you won't have command line requirements.
+However in this way it will only usable as Python module, you won't have
+command line requirements.
 
 To have command line working you will need to do instead: ::
 
@@ -160,6 +161,11 @@ Here is a sample: ::
             {
                 "name": "perdu.com",
                 "url": "http://perdu.com/"
+                "screenshot_method": "body",
+                "tasks": [
+                    "screenshot",
+                    "report"
+                ]
             },
             {
                 "name": "google.com",
@@ -224,19 +230,31 @@ tasks
 
     Although it's an optional argument, this is not really useful to define a
     page job without it since it won't do nothing except to initialize driver.
+screenshot_method
+    Optional method to perform screenshot. It can be either ``body`` or
+    ``window``, default when not defined is ``body``.
+
+    * ``body`` method will capture content from  ``<body>`` element, it means
+      content are rendered from browser size but screenshot image will
+      probably smaller or bigger than window size depending of content size;
+    * ``window`` method will strictly respect browser size, if content is
+      bigger it will be cutted out from screenshot and if bigger you will
+      empty space in resulting image. You may also have window scrollbar added
+      or removed from image depending content and browser.
 
 Known issues
 ************
 
-* Screenshots are not consistant through browsers and what you should except
-  (compared to what you see when looking a page from a browser);
 * Firefox report task is not able to get console logs, only Javascript errors;
+* When doing a screenshot with ``body`` method with Chrome browser, if content
+  width and height is bigger than browser size the horizontal scrollbar will be
+  included at browser size bottom. This seems a bug of Chrome driver.
 
 Development
 ***********
 
-Project is developped with tests, for convenience they are splitted in two separate
-directories.
+Project is developped with tests, for convenience they are splitted in two
+distinct directory.
 
 One to cover core interface which can be runned once project is installed
 and one another dedicated to cover webdriver interfaces.

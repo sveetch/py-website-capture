@@ -4,6 +4,8 @@ import logging
 
 from website_capture.exceptions import SettingsInvalidError
 
+ALLOWED_SCREENSHOT_METHODS = ["body", "window"]
+
 
 def get_project_configuration(fileobject):
     """
@@ -40,6 +42,15 @@ def get_project_configuration(fileobject):
     if "pages" not in config:
         msg = ("Your configuration must contains a list of pages in a "
                "'pages' item.")
+        raise SettingsInvalidError(msg)
+
+    if ("screenshot_method" in config
+        and config["screenshot_method"] not in ALLOWED_SCREENSHOT_METHODS):
+        msg = ("Unknowed screenshot method '{}', it must be one of allowed "
+               "methods: {}".format(
+                   config["screenshot_method"],
+                   ", ".joint(ALLOWED_SCREENSHOT_METHODS)
+                ))
         raise SettingsInvalidError(msg)
 
     for page in config["pages"]:

@@ -4,8 +4,8 @@
 Page tests
 =========
 
-This is a sample website project to build some page for testing
-py-website-capture with webdrivers against some behaviors.
+This is a sample website project to build some pages for testing
+``py-website-capture`` with webdrivers against some cases.
 
 Features
 ********

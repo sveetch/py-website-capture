@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from website_capture.interfaces.base import BaseInterface, LogManagerMixin
-
+from website_capture.exceptions import PageConfigError
 
 class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
     """
@@ -41,9 +41,6 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
 
         return {
             "options": options,
-            # NOTE: Seems deprecated
-            #"log_path": config["driver_log_path"],
-            # NOTE: In profit of this one
             "service_log_path": config["driver_log_path"],
             "desired_capabilities": dc,
             "firefox_profile": fp,
@@ -101,13 +98,20 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
         return path
 
     def task_screenshot(self, driver, config, response):
-        """
-        A trick with this driver is to select the body element to get it full,
-        since default driver screenshot behavior will cut content to the
-        window viewport (that should be the asked size from page config).
-        """
-        el = driver.find_element_by_tag_name("body")
-        el.screenshot(config["screenshot_path"])
+        driver.get_screenshot_as_file(config["screenshot_path"])
+
+        return config["screenshot_path"]
+
+    def task_screenshot(self, driver, config, response):
+        method = config.get("screenshot_method", "body")
+
+        if method == "body":
+            el = driver.find_element_by_tag_name("body")
+            el.screenshot(config["screenshot_path"])
+        elif method == "window":
+            driver.get_screenshot_as_file(config["screenshot_path"])
+        else:
+            raise PageConfigError("Unknowed screenshot method: {}".format(method))
 
         return config["screenshot_path"]
 
@@ -177,11 +181,6 @@ class SeleniumChromeInterface(SeleniumFirefoxInterface):
             logs.append((level, msg.strip()))
 
         return logs
-
-    def task_screenshot(self, driver, config, response):
-        driver.get_screenshot_as_file(config["screenshot_path"])
-
-        return config["screenshot_path"]
 
     def tear_down_driver(self, driver, config):
         super().tear_down_driver(driver, config)

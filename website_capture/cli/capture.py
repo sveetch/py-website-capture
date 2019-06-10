@@ -20,7 +20,9 @@ INTERFACES = OrderedDict((
     ("chrome", SeleniumChromeInterface),
 ))
 
+
 DEFAULT_INTERFACE = "dummy"
+
 
 @click.command()
 @click.option("--interface",
