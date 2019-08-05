@@ -33,3 +33,10 @@ class InvalidPageSizeError(SettingsInvalidError):
     Exception to be raised when an encountered size is invalid.
     """
     pass
+
+
+class ProcessorImportError(SettingsInvalidError):
+    """
+    Exception to be raised when a processor import fails.
+    """
+    pass

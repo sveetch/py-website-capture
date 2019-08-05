@@ -4,9 +4,12 @@ import io
 import json
 import logging
 import os
+from importlib import import_module
+from collections import OrderedDict
 
 from selenium.common.exceptions import WebDriverException
-from website_capture.exceptions import InvalidPageSizeError, PageConfigError
+from website_capture.exceptions import (InvalidPageSizeError, PageConfigError,
+                                        ProcessorImportError)
 
 
 class BaseInterface(object):
@@ -30,6 +33,7 @@ class BaseInterface(object):
     AVAILABLE_PAGE_TASKS = {
         "screenshot": "task_screenshot",
         "report": "task_report",
+        "processing": "task_processing",
     }
 
     def __init__(self, basedir="", headless=True, size_dir=True):
@@ -170,7 +174,7 @@ class BaseInterface(object):
 
     def load_page(self, driver, config):
         """
-        Load given page url into given driver
+        Load given page url into given driver.
 
         Returns:
             dict: A dictionnary with informations about page loading. Interface
@@ -188,12 +192,27 @@ class BaseInterface(object):
     def task_screenshot(self, driver, config, response):
         """
         Should screenshot loaded page.
+
+        Basic method don't do anything since all the work is dependent from
+        final driver interface implementation.
         """
         return config["screenshot_path"]
 
     def task_report(self, driver, config, response):
         """
-        Should get browser report from loaded page
+        Should get browser report from loaded page.
+
+        You interface should inherit from ``LogManagerMixin`` mixin to have
+        more useful method.
+        """
+        return {}
+
+    def task_processing(self, driver, config, response):
+        """
+        Should process some tasks from enabled modules
+
+        You interface should inherit from ``ProcessorManagerMixin`` mixin to
+        have more useful method.
         """
         return {}
 
@@ -382,7 +401,7 @@ class LogManagerMixin:
             able to capture logs from "unload" browser events (like when a
             window is closed).
         """
-        payload = {
+        report = {
             "name": config["name"],
             "url": config["url"],
             "size": config["size"],
@@ -392,6 +411,72 @@ class LogManagerMixin:
 
         content = self.get_driver_logs_content(driver, config, response)
 
-        payload["logs"] = self.parse_logs(driver, config, content)
+        report["logs"] = self.parse_logs(driver, config, content)
 
-        return payload
+        return report
+
+
+class ProcessorManagerMixin:
+    """
+    A mixin for interface to get and execute processors.
+    """
+    def split_processor_path(self, path):
+        """
+        Validate and split given path to divide module path and object.
+        """
+        if not isinstance(path, str):
+            msg = "Processor path must be a string: {}"
+            raise ProcessorImportError(msg.format(path))
+
+        path_items = path.split(".")
+        if len(path_items) <= 1:
+            msg = "Invalid processor path: {}"
+            raise ProcessorImportError(msg.format(path))
+
+        return ".".join(path_items[:-1]), path_items[-1]
+
+    def get_processors_objects(self, paths):
+        """
+        Get processor objects
+        """
+        objects = []
+
+        for name in paths:
+            module_path, object_name = self.split_processor_path(name)
+
+            try:
+                module = import_module(module_path)
+            except ModuleNotFoundError:
+                msg = "Unable to import module '{module_path}'"
+                raise ProcessorImportError(msg.format(
+                    module_path=module_path,
+                ))
+
+            try:
+                objects.append(getattr(module, object_name))
+            except AttributeError:
+                msg = "Unable to get object '{object_name}' from module '{module_path}'"
+                raise ProcessorImportError(msg.format(
+                    module_path=module_path,
+                    object_name=object_name,
+                ))
+
+        return objects
+
+    def get_processor_instance(self, driver, config, response, processor):
+        return processor()
+
+    def task_processing(self, driver, config, response):
+        """
+        Run processors and return their outputs.
+        """
+        report = []
+        processors = self.get_processors_objects(config.get("processors", []))
+
+        for processor in processors:
+            proc = self.get_processor_instance(driver, config, response, processor)
+            report.append(
+                (processor.name, proc.run(driver, config, response))
+            )
+
+        return report

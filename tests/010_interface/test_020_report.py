@@ -48,11 +48,11 @@ def test_parse_logs(page, content, expected):
         }
     ),
 ])
-def test_task_logs(temp_builds_dir, insert_basedir, page, content, expected):
+def test_task_report(temp_builds_dir, insert_basedir, page, content, expected):
     """
-    'task_logs' method should return browser log filepath
+    'task_report' method should return browser log filepath
     """
-    basedir = temp_builds_dir.join('logmanager_task_logs')
+    basedir = temp_builds_dir.join('logmanager_task_report')
     os.makedirs(basedir)
 
     page = insert_basedir(basedir, page, fields=["driver_log_path"])

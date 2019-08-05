@@ -95,7 +95,7 @@ def test_get_available_sizes(pages, expected):
     """
     interface = BaseInterface()
 
-    assert interface.get_available_sizes(pages) == expected
+    assert expected == interface.get_available_sizes(pages)
 
 
 @pytest.mark.parametrize("pages", [
@@ -132,7 +132,7 @@ def test_get_size_repr(width, height, expected):
     """
     interface = BaseInterface()
 
-    assert interface.get_size_repr(width, height) == expected
+    assert expected == interface.get_size_repr(width, height)
 
 
 @pytest.mark.parametrize("size,size_dir,expected", [
@@ -143,7 +143,7 @@ def test_get_size_repr(width, height, expected):
 def test_get_destination_dir(size, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
 
-    assert interface.get_destination_dir(size) == expected
+    assert expected == interface.get_destination_dir(size)
 
 
 @pytest.mark.parametrize("config,size_dir,expected", [
@@ -178,7 +178,7 @@ def test_get_destination_dir(size, size_dir, expected):
 def test_get_file_destination(config, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
 
-    assert interface.get_file_destination(config) == expected
+    assert expected == interface.get_file_destination(config)
 
 
 @pytest.mark.parametrize("page", [
@@ -253,7 +253,7 @@ def test_get_page_config_invalid(page):
 def test_get_page_config(page, size, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
     interface.DESTINATION_FILEPATH = "{name}_test"
-    assert interface.get_page_config(page, size) == expected
+    assert expected == interface.get_page_config(page, size)
 
 
 def test_get_driver_options():
@@ -300,7 +300,7 @@ def test_load_page(page, size, size_dir, expected):
 
     config = interface.get_page_config(page, size)
 
-    assert interface.load_page(driver, config) == expected
+    assert expected == interface.load_page(driver, config)
 
 
 @pytest.mark.parametrize("page,size,size_dir,expected", [
@@ -347,6 +347,23 @@ def test_load_page(page, size, size_dir, expected):
             "report": {},
         },
     ),
+    # Processing task
+    (
+        {
+            "name": "foo",
+            "url": "some_url",
+            "tasks": ["processing"],
+            "processors": [],
+        },
+        (1, 42),
+        True,
+        {
+            "name": "foo",
+            "url": "some_url",
+            "size": (1, 42),
+            "processing": {},
+        },
+    ),
 ])
 def test_capture(page, size, size_dir, expected):
     interface = BaseInterface("/basedir", size_dir=size_dir)
@@ -356,4 +373,4 @@ def test_capture(page, size, size_dir, expected):
 
     config = interface.get_page_config(page, size)
 
-    assert interface.capture(driver, config) == expected
+    assert expected == interface.capture(driver, config)

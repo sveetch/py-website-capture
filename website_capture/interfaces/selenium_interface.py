@@ -9,6 +9,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from website_capture.interfaces.base import BaseInterface, LogManagerMixin
 from website_capture.exceptions import PageConfigError
 
+
 class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
     """
     Using Firefox browser directly from WebDriver through Selenium.
@@ -96,11 +97,6 @@ class SeleniumFirefoxInterface(LogManagerMixin, BaseInterface):
         path = self.store_browser_logs(driver, config, payload)
 
         return path
-
-    def task_screenshot(self, driver, config, response):
-        driver.get_screenshot_as_file(config["screenshot_path"])
-
-        return config["screenshot_path"]
 
     def task_screenshot(self, driver, config, response):
         method = config.get("screenshot_method", "body")

@@ -162,7 +162,12 @@ Here is a sample: ::
                 "name": "perdu.com",
                 "url": "http://perdu.com/"
                 "screenshot_method": "body",
+                "processors": [
+                    "website_capture.processors.DummyProcessor",
+                    "website_capture.processors.ProcessorBase"
+                ],
                 "tasks": [
+                    "processing",
                     "screenshot",
                     "report"
                 ]
@@ -173,6 +178,9 @@ Here is a sample: ::
                 "sizes": [
                     [330, 768],
                     [1440, 768]
+                ],
+                "tasks": [
+                    "screenshot"
                 ]
             }
         ]
@@ -226,10 +234,16 @@ tasks
     A list of tasks to perform for this page. Available tasks are:
 
     * ``screenshot``: will create an image file of page screenshot;
+    * ``processing`` will perform some tasks on page from additional modules;
     * ``report`` will create a JSON file to report captured logs from page;
 
     Although it's an optional argument, this is not really useful to define a
     page job without it since it won't do nothing except to initialize driver.
+
+    Also the order does matter, ``report`` should always been the last item to
+    be available to get every logs from possible previous tasks. ``screenshot``
+    should be the first one if you don't use ``processing`` or if your
+    processors don't alterate the page.
 screenshot_method
     Optional method to perform screenshot. It can be either ``body`` or
     ``window``, default when not defined is ``body``.
@@ -241,6 +255,47 @@ screenshot_method
       bigger it will be cutted out from screenshot and if bigger you will
       empty space in resulting image. You may also have window scrollbar added
       or removed from image depending content and browser.
+processors
+    A list of Python path to processor objects, they will be executed one after
+    another given the page content (which could be altered by possible
+    previous processors). Last part of path must be the processor object to run
+    and everything before is the module(s) path to reach the object.
+
+
+Processors
+..........
+
+**TODO: On current development**
+
+Processors are objects to perform custom jobs you can code on your own.
+
+Available ``processors`` are defined in page option as a list of Python paths
+and their execution is enabled when ``processing`` is in the tasks list.
+
+For example, this is the base processor: ::
+
+    class ProcessorBase(object):
+        """
+        Basic processor don't do anything except exposing required methods
+        signatures.
+
+        Attributes:
+            name (string): Processor name used to store its report datas or
+                logging possible events. Each processor must have an unique name.
+        """
+        name = "basic"
+
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def run(self, driver, config, response):
+            """
+            This is where your processor should perform its work and possibly
+            returns datas to append to processor reports which will be stored with
+            processor name.
+            """
+            return None
+
 
 Known issues
 ************
