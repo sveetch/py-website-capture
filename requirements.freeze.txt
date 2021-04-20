@@ -8,7 +8,7 @@ flake8==3.7.7
 mccabe==0.6.1
 more-itertools==7.0.0
 pluggy==0.9.0
-py==1.8.0
+py==1.10.0
 -e git+git@github.com:sveetch/py-website-capture.git@ee7155b237c41d3fedfd33ac0432efc509ca6ba2#egg=py_website_capture
 pycodestyle==2.5.0
 pyflakes==2.1.1
